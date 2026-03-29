@@ -1,0 +1,27 @@
+{
+  "name": "live-debate-system",
+  "version": "1.0.0",
+  "description": "直播辩论系统 - 完整项目（前端 + 网关 + 后端）",
+  "scripts": {
+    "start": "npm-run-all --parallel start:backend start:gateway",
+    "start:backend": "cd backend && npm start",
+    "start:gateway": "cd gateway && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../gateway && npm install",
+    "dev": "npm-run-all --parallel dev:backend dev:gateway",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:gateway": "cd gateway && npm run dev",
+    "test": "cd backend && npm test"
+  },
+  "dependencies": {
+    "npm-run-all": "^4.1.5"
+  },
+  "keywords": [
+    "debate",
+    "live",
+    "streaming",
+    "websocket",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

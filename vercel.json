@@ -1,26 +1,37 @@
 {
   "version": 2,
+  "name": "live-debate-system",
   "builds": [
     {
-      "src": "backend/src/server.js",
+      "src": "gateway/gateway.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/src/server.js"
+      "dest": "gateway/gateway.js"
     },
     {
-      "src": "/admin(.*)",
-      "dest": "backend/src/server.js"
+      "src": "/admin/(.*)",
+      "dest": "gateway/gateway.js"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "gateway/gateway.js"
     },
     {
       "src": "/ws",
-      "dest": "backend/src/server.js"
+      "dest": "gateway/gateway.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "gateway/gateway.js"
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "BACKEND_PORT": "8081",
+    "PORT": "8080"
   }
 }

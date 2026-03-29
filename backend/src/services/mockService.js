@@ -256,7 +256,7 @@ const liveSchedule = {
 
 // 生成动态AI辩论内容
 function generateAIDebateContent(topic, position) {
-	const arguments = {
+	const args = {
 		left: [
 			`关于"${topic}"，我认为会按这个按钮。痛苦是阻碍人类进步的主要障碍之一。`,
 			`消除痛苦可以让人们更专注于创造和建设，而不是被负面情绪所困扰。`,
