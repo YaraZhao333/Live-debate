@@ -8,7 +8,12 @@ const server = http.createServer(app);
 
 const BACKEND_PORT = process.env.BACKEND_PORT || 8081;
 const GATEWAY_PORT = process.env.PORT || 10000;
-const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
+let BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
+
+// 确保 BACKEND_URL 有 http:// 协议
+if (BACKEND_URL && !BACKEND_URL.startsWith('http://') && !BACKEND_URL.startsWith('https://')) {
+    BACKEND_URL = `http://${BACKEND_URL}`;
+}
 
 app.use(cors({
     origin: '*',
