@@ -37,12 +37,12 @@ app.options('*', (req, res) => {
 
 app.use(express.json());
 
-// 前端静态资源服务 - 整个 frontend 目录
-app.use(express.static(path.join(__dirname, '../frontend')));
+// 前端静态资源服务 - 指向构建后的 H5 目录
+app.use(express.static(path.join(__dirname, '../frontend/unpackage/dist/build/web')));
 
 // 前端首页路由
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/unpackage/dist/build/web/index.html'));
 });
 
 // 后台管理页面路由
