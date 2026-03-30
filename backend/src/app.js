@@ -28,6 +28,18 @@ app.use(cors({
 // 解析JSON请求体
 app.use(express.json());
 
+// 健康检查端点
+app.get('/health', (req, res) => {
+    res.json({
+        code: 0,
+        message: 'success',
+        data: {
+            status: 'healthy',
+            timestamp: new Date().toISOString()
+        }
+    });
+});
+
 // 配置WebSocket
 setupWebSocketServer(server);
 
