@@ -37,14 +37,19 @@ app.options('*', (req, res) => {
 
 app.use(express.json());
 
+// 前端静态资源服务 - 整个 frontend 目录
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// 前端首页路由
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 // 后台管理页面路由
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/admin/index.html'));
 });
 app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
-
-// 静态资源路由
-app.use('/static', express.static(path.join(__dirname, '../frontend/static')));
 
 // 创建代理中间件 - 代理所有 /api 开头的路径到后端服务器
 const backendProxy = createProxyMiddleware({
