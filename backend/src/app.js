@@ -31,6 +31,11 @@ app.use(express.json());
 // 配置WebSocket
 setupWebSocketServer(server);
 
+// 根路径 - 重定向到后台管理
+app.get('/', (req, res) => {
+    res.redirect('/admin');
+});
+
 // 后台管理页面路由
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../admin', 'index.html'));

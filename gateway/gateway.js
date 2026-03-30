@@ -13,8 +13,8 @@ const server = http.createServer(app);
 
 // 配置
 const BACKEND_PORT = process.env.BACKEND_PORT || 8081;
-const GATEWAY_PORT = process.env.GATEWAY_PORT || 3000;
-const BACKEND_URL = `http://localhost:${BACKEND_PORT}`;
+const GATEWAY_PORT = process.env.PORT || 3000;
+const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
 
 // 跨域配置
 app.use(cors({
@@ -40,9 +40,9 @@ app.use(express.json());
 // 前端静态资源服务 - 指向构建后的 H5 目录
 app.use(express.static(path.join(__dirname, '../frontend/unpackage/dist/build/web')));
 
-// 前端首页路由
+// 前端首页路由 - 重定向到后台管理
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/unpackage/dist/build/web/index.html'));
+    res.redirect('/admin');
 });
 
 // 后台管理页面路由
@@ -133,7 +133,8 @@ function setupWebSocketProxy() {
 // 转发消息到后端 WebSocket
 function forwardToBackend(data) {
     const ws = require('ws');
-    const backendWs = new ws.WebSocket(`ws://localhost:${BACKEND_PORT}/ws`);
+    const backendWsUrl = BACKEND_URL.replace(/^http/, 'ws') + '/ws';
+    const backendWs = new ws.WebSocket(backendWsUrl);
 
     backendWs.on('open', () => {
         backendWs.send(JSON.stringify(data));
