@@ -50,15 +50,14 @@ const getCurrentConfig = () => {
 class ApiService {
   constructor() {
     this.config = getCurrentConfig();
-    // 强制使用 API_BASE_URL，确保使用配置文件中的地址
-    this.baseURL = API_BASE_URL || this.config.current || 'http://192.168.31.249:8081';
-    this.timeout = 10000; // 10秒超时
+    this.baseURL = API_BASE_URL;
+    this.timeout = 10000;
     
-    // 调试日志：显示初始化的服务器地址
     if (typeof console !== 'undefined') {
       console.log('🔧 ApiService 初始化');
       console.log('📡 API_BASE_URL:', API_BASE_URL);
       console.log('📡 this.baseURL:', this.baseURL);
+      console.log('📡 使用相对路径:', !this.baseURL || this.baseURL === '');
     }
   }
 
@@ -67,10 +66,8 @@ class ApiService {
    * @param {string} serverUrl - 新的服务器地址
    */
   updateConfig(serverUrl) {
-    // 如果传入的是空值，使用配置文件中的默认地址
-    this.baseURL = serverUrl || API_BASE_URL || 'http://192.168.31.249:8081';
+    this.baseURL = serverUrl !== undefined ? serverUrl : API_BASE_URL;
     
-    // 调试日志
     if (typeof console !== 'undefined') {
       console.log('🔧 ApiService.updateConfig 被调用');
       console.log('📡 新地址:', this.baseURL);
@@ -93,8 +90,14 @@ class ApiService {
 
     // 构建完整URL
     // 确保使用最新的 baseURL（如果被 updateConfig 更新过）
-    const baseUrl = this.baseURL || API_BASE_URL || 'http://192.168.31.249:8081';
-    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    const baseUrl = this.baseURL || API_BASE_URL;
+    let fullUrl;
+    
+    if (!baseUrl || baseUrl === '') {
+      fullUrl = url.startsWith('/') ? url : `/${url}`;
+    } else {
+      fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    }
     
     // 调试日志（开发环境）
     if (process.env.NODE_ENV === 'development' && typeof console !== 'undefined') {
@@ -923,10 +926,16 @@ class ApiService {
    * @returns {string} WebSocket连接地址
    */
   getWebSocketUrl() {
-    const baseUrl = this.baseURL || API_BASE_URL || 'http://192.168.31.249:8081';
+    const baseUrl = this.baseURL || API_BASE_URL;
+    
+    if (!baseUrl || baseUrl === '') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      return `${protocol}//${host}/ws`;
+    }
+    
     const wsProtocol = baseUrl.startsWith('https') ? 'wss' : 'ws';
     const wsHost = baseUrl.replace(/^https?:\/\//, '');
-    // WebSocket 路径是 /ws（不是 /api/v1/ws）
     return `${wsProtocol}://${wsHost}/ws`;
   }
 
