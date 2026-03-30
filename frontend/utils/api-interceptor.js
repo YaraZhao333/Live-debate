@@ -12,9 +12,10 @@ class ApiInterceptor {
       maxRetries: 3,
       retryDelay: 1000,
       retryCondition: (error) => {
-        // 网络错误或5xx服务器错误时重试
-        return error.message.includes('network') || 
-               error.message.includes('timeout') ||
+        if (!error) return false;
+        const msg = error.message || '';
+        return msg.includes('network') || 
+               msg.includes('timeout') ||
                (error.statusCode && error.statusCode >= 500);
       }
     };
