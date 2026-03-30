@@ -8,7 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-    healthCheckPath: /api/admin/votes
+    healthCheckPath: /health
+    autoDeploy: true
 
   - type: web
     name: live-debate-gateway
@@ -23,8 +24,9 @@ services:
         fromService:
           name: live-debate-backend
           type: web
-          property: hostport
-    healthCheckPath: /api/admin/votes
+          property: host
+    healthCheckPath: /health
+    autoDeploy: true
 
   - type: web
     name: live-debate-frontend
@@ -35,3 +37,5 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+    healthCheckPath: /health
+    autoDeploy: true

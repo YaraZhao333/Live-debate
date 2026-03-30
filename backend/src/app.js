@@ -36,6 +36,15 @@ app.use(express.json());
 // 配置WebSocket
 setupWebSocketServer(server);
 
+// 健康检查端点（Render必需）
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'backend',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // API路由挂载
 app.use('/api', voteRoutes);
 app.use('/api', liveRoutes);

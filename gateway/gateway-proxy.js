@@ -12,8 +12,20 @@ let BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
 
 // 确保 BACKEND_URL 有 http:// 协议
 if (BACKEND_URL && !BACKEND_URL.startsWith('http://') && !BACKEND_URL.startsWith('https://')) {
-    BACKEND_URL = `http://${BACKEND_URL}`;
+    // 如果只提供了主机名，添加协议
+    if (BACKEND_URL.indexOf(':') === -1) {
+        // 只有主机名，没有端口，添加默认端口
+        BACKEND_URL = `http://${BACKEND_URL}:${BACKEND_PORT}`;
+    } else {
+        // 有主机名和端口，只添加协议
+        BACKEND_URL = `http://${BACKEND_URL}`;
+    }
 }
+
+console.log('🔧 后端连接配置:', {
+    rawEnv: process.env.BACKEND_URL,
+    finalUrl: BACKEND_URL
+});
 
 app.use(cors({
     origin: '*',
@@ -56,6 +68,16 @@ const backendProxy = createProxyMiddleware({
             });
         }
     }
+});
+
+// 健康检查端点（Render必需）
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'gateway',
+        backendUrl: BACKEND_URL,
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.use('/api', backendProxy);

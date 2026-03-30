@@ -28,6 +28,15 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
+// 健康检查端点（Render必需）
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'frontend',
+        timestamp: new Date().toISOString()
+    });
+});
+
 server.listen(PORT, '0.0.0.0', () => {
     console.log('═══════════════════════════════════════');
     console.log('🌐 Frontend 静态资源服务器已启动');
