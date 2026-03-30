@@ -10,7 +10,6 @@ yarn-error.log*
 # 目录和打包产物
 /dist/
 /build/
-# /unpackage/  - 不忽略，因为需要提交构建后的 H5 文件
 /.temp/
 .cache/
 coverage/
