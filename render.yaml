@@ -8,8 +8,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 8081
     healthCheckPath: /api/admin/votes
 
   - type: web
@@ -21,8 +19,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: BACKEND_URL
         fromService:
           name: live-debate-backend
@@ -39,5 +35,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000

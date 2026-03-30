@@ -137,7 +137,7 @@ app.use((req, res) => {
     });
 });
 
-server.listen(GATEWAY_PORT, () => {
+server.listen(GATEWAY_PORT, '0.0.0.0', () => {
     console.log('═══════════════════════════════════════');
     console.log('🌐 Gateway 网关服务器已启动');
     console.log('═══════════════════════════════════════');

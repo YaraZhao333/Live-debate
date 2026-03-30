@@ -28,13 +28,13 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log('═══════════════════════════════════════');
     console.log('🌐 Frontend 静态资源服务器已启动');
     console.log('═══════════════════════════════════════');
     console.log(`📋 监听端口: ${PORT}`);
-    console.log(`🌐 访问地址: http://localhost:${PORT}`);
-    console.log(`🖥️  后台管理: http://localhost:${PORT}/admin`);
+    console.log(`🌐 访问地址: http://0.0.0.0:${PORT}`);
+    console.log(`🖥️  后台管理: http://0.0.0.0:${PORT}/admin`);
     console.log('═══════════════════════════════════════');
 });
 
