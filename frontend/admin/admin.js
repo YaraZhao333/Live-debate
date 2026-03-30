@@ -81,17 +81,16 @@ function initWebSocket() {
 	try {
 		// 使用专门的 WebSocket URL（如果配置了），否则使用 BASE_URL
 		let wsBaseUrl = SERVER_CONFIG.WEB_SOCKET_URL || SERVER_CONFIG.BASE_URL;
-		let wsUrl;
 		
 		// 如果是相对路径，转换为绝对路径
 		if (!wsBaseUrl || wsBaseUrl === '') {
 			const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-			wsUrl = `${protocol}//${window.location.host}/ws`;
-		} else {
-			const baseUrl = new URL(wsBaseUrl);
-			const protocol = (baseUrl.protocol === 'https:' || baseUrl.protocol === 'wss:') ? 'wss:' : 'ws:';
-			wsUrl = `${protocol}//${baseUrl.host}/ws`;
+			wsBaseUrl = `${protocol}//${window.location.host}`;
 		}
+		
+		const baseUrl = new URL(wsBaseUrl);
+		const protocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+		const wsUrl = `${protocol}//${baseUrl.host}/ws`;
 		
 		console.log('🔌 连接WebSocket:', wsUrl);
 		

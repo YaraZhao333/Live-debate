@@ -852,7 +852,7 @@
 			if (window.SERVER_CONFIG && window.SERVER_CONFIG.BASE_URL) {
 				return window.SERVER_CONFIG.BASE_URL;
 			}
-			return '';
+			return 'http://localhost:8081';
 		};
 
 		// 全局状态
@@ -1425,16 +1425,9 @@
 		function initWebSocket() {
 			try {
 				const wsBaseUrl = getAPIBase();
-				let wsUrl;
-				
-				if (!wsBaseUrl || wsBaseUrl === '') {
-					const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-					wsUrl = `${protocol}//${window.location.host}/ws`;
-				} else {
-					const baseUrl = new URL(wsBaseUrl);
-					const protocol = (baseUrl.protocol === 'https:' || baseUrl.protocol === 'wss:') ? 'wss:' : 'ws:';
-					wsUrl = `${protocol}//${baseUrl.host}/ws`;
-				}
+				const baseUrl = new URL(wsBaseUrl);
+				const protocol = baseUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+				const wsUrl = `${protocol}//${baseUrl.host}/ws`;
 
 				ws = new WebSocket(wsUrl);
 
