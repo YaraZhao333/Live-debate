@@ -21,10 +21,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: BACKEND_URL
-        fromService:
-          name: live-debate-backend
-          type: web
-          property: host
+        value: https://live-debate-backend.onrender.com
     healthCheckPath: /health
     autoDeploy: true
 
