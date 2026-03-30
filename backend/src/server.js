@@ -2,11 +2,12 @@ const { app, server } = require('./app');
 const serverCfg = require('../config/server-mode.node.js');
 const { getCurrentServerConfig, printConfig } = serverCfg;
 
-// 获取服务器配置 - Render 环境优先使用 process.env.PORT
-const port = process.env.PORT || 8080;
+// 获取服务器配置
+const currentConfig = getCurrentServerConfig();
+const port = currentConfig.port || 8080;
 
 // 启动服务器
-server.listen(port, '0.0.0.0', () => {
+server.listen(port, () => {
   printConfig();
   console.log(`✅ 服务器已启动，运行在端口 ${port}`);
   console.log(`🔗 访问地址: http://localhost:${port}`);
