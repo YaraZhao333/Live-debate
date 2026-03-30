@@ -38,7 +38,7 @@ Thumbs.db
 # Build outputs
 dist/
 build/
-# .unpackage/  - 注释掉，因为我们需要提交构建后的 H5 文件
+.unpackage/
 
 # Temporary files
 *.tmp
