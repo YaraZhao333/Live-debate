@@ -31,11 +31,19 @@ app.use(express.json());
 // 配置WebSocket
 setupWebSocketServer(server);
 
+// 前端静态资源服务 - 指向构建后的 H5 目录
+app.use(express.static(path.join(__dirname, '../../frontend/unpackage/dist/build/web')));
+
+// 前端首页路由
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/unpackage/dist/build/web/index.html'));
+});
+
 // 后台管理页面路由
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../frontend/admin/index.html'));
 });
-app.use('/admin', express.static(path.join(__dirname, '../admin')));
+app.use('/admin', express.static(path.join(__dirname, '../../frontend/admin')));
 
 // API路由挂载
 app.use('/api', voteRoutes);
