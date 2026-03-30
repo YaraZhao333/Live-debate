@@ -132,5 +132,30 @@ module.exports = {
                 message: error.message
             });
         }
+    },
+
+    // 获取观看人数
+    getViewersCount: (req, res) => {
+        try {
+            const streamId = req.query.stream_id;
+            const viewers = Math.floor(Math.random() * 200) + 50;
+            
+            res.json({
+                code: 0,
+                message: 'success',
+                data: {
+                    streamId: streamId,
+                    viewers: viewers,
+                    timestamp: Date.now()
+                }
+            });
+        } catch (error) {
+            console.error('获取观看人数失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '获取失败',
+                data: null
+            });
+        }
     }
 };

@@ -9,13 +9,13 @@ const SERVER_CONFIG = {
 	BACKEND_URL: 'http://192.140.160.119:8000',
 	// 当前使用的地址（修改这里切换服务器）
 	get BASE_URL() {
-		// 🔧 配置：直接访问真实后端服务器（获取真实数据）
-		return this.BACKEND_URL; // 使用真实后端服务器
+		// 🔧 配置：使用相对路径，通过网关访问
+		return ''; // 使用相对路径，通过网关代理
 	},
 	get WEB_SOCKET_URL() {
-		// 🔧 配置：WebSocket 也直接连接到真实后端服务器
+		// 🔧 配置：WebSocket 也使用相对路径
 		// 如果真实后端服务器不支持 WebSocket，可以设置为 null 来禁用 WebSocket
-		return this.BACKEND_URL; // 使用真实后端服务器
+		return ''; // 使用相对路径，通过网关代理
 	}
 };
 
@@ -80,13 +80,12 @@ function initWebSocket() {
 	// 从服务器配置获取WebSocket地址
 	try {
 		// 使用专门的 WebSocket URL（如果配置了），否则使用 BASE_URL
-		const wsBaseUrl = SERVER_CONFIG.WEB_SOCKET_URL || SERVER_CONFIG.BASE_URL;
+		let wsBaseUrl = SERVER_CONFIG.WEB_SOCKET_URL || SERVER_CONFIG.BASE_URL;
 		
-		// 如果 WebSocket URL 为 null 或未配置，禁用 WebSocket
-		if (!wsBaseUrl) {
-			console.log('ℹ️ WebSocket 已禁用（未配置 WebSocket URL）');
-			updateConnectionStatus(false);
-			return;
+		// 如果是相对路径，转换为绝对路径
+		if (!wsBaseUrl || wsBaseUrl === '') {
+			const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+			wsBaseUrl = `${protocol}//${window.location.host}`;
 		}
 		
 		const baseUrl = new URL(wsBaseUrl);

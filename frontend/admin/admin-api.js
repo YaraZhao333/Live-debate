@@ -7,8 +7,8 @@ const getAPIBase = () => {
 	if (window.SERVER_CONFIG && window.SERVER_CONFIG.BASE_URL) {
 		return window.SERVER_CONFIG.BASE_URL;
 	}
-	// 默认使用真实后端服务器（如果admin.js未加载）
-	return 'http://192.140.160.119:8000';
+	// 默认使用当前域名的相对路径
+	return '';
 };
 
 // 📋 说明：当前配置
@@ -465,7 +465,19 @@ async function fetchDashboard(streamId = null) {
 		if (!streamId) {
 			try {
 				const streamsResult = await getStreamsList();
-				const streams = streamsResult?.streams || streamsResult?.data || (Array.isArray(streamsResult) ? streamsResult : []);
+				console.log('📊 [fetchDashboard] streamsResult:', streamsResult);
+				
+				let streams = [];
+				if (streamsResult?.data?.streams) {
+					streams = streamsResult.data.streams;
+				} else if (streamsResult?.streams) {
+					streams = streamsResult.streams;
+				} else if (Array.isArray(streamsResult)) {
+					streams = streamsResult;
+				}
+				
+				console.log('📊 [fetchDashboard] 解析后的 streams:', streams);
+				
 				if (streams && streams.length > 0) {
 					const activeStream = streams.find(s => s.enabled === true);
 					streamId = activeStream ? activeStream.id : streams[0].id;

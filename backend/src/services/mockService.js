@@ -121,6 +121,15 @@ const streams = {
 		return mockData.streams[index];
 	},
 	
+	toggleEnabled: (id) => {
+		const index = mockData.streams.findIndex(s => s.id === id);
+		if (index === -1) return null;
+		
+		mockData.streams[index].enabled = !mockData.streams[index].enabled;
+		mockData.streams[index].updatedAt = new Date().toISOString();
+		return mockData.streams[index];
+	},
+	
 	getActive: () => {
 		return mockData.streams.find(s => s.enabled === true);
 	}

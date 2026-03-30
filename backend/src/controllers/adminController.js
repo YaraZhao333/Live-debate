@@ -1,4 +1,5 @@
 const mockService = require('../services/mockService');
+const voteService = require('../services/voteService');
 
 // 管理员相关控制器
 module.exports = {
@@ -76,6 +77,34 @@ module.exports = {
                 success: false,
                 error: '获取失败',
                 message: error.message
+            });
+        }
+    },
+
+    // 获取仪表板数据
+    getDashboard: (req, res) => {
+        try {
+            const streamId = req.query.stream_id;
+            const dashboard = mockService.statistics.getDashboard();
+            const votes = voteService.getVotes();
+            const debate = mockService.debate.get();
+            
+            res.json({
+                code: 0,
+                message: 'success',
+                data: {
+                    ...dashboard,
+                    votes: votes,
+                    debate: debate,
+                    streamId: streamId
+                }
+            });
+        } catch (error) {
+            console.error('获取仪表板数据失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     }

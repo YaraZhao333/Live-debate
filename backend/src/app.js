@@ -8,6 +8,7 @@ const voteRoutes = require('./routes/voteRoutes');
 const liveRoutes = require('./routes/liveRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const streamsRoutes = require('./routes/streamsRoutes');
 
 // 导入WebSocket服务
 const { setupWebSocketServer } = require('./websocket/wsServer');
@@ -41,9 +42,11 @@ app.use('/api', voteRoutes);
 app.use('/api', liveRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', aiRoutes);
+app.use('/api', streamsRoutes);
 app.use('/api/v1', voteRoutes);
 app.use('/api/v1', liveRoutes);
 app.use('/api/v1', adminRoutes);
 app.use('/api/v1', aiRoutes);
+app.use('/api/v1', streamsRoutes);
 
 module.exports = { app, server };
