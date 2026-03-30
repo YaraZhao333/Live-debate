@@ -27,6 +27,16 @@ console.log('🔧 后端连接配置:', {
     finalUrl: BACKEND_URL
 });
 
+// 健康检查端点（Render必需）- 必须放在最前面
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        service: 'gateway',
+        backendUrl: BACKEND_URL,
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -68,16 +78,6 @@ const backendProxy = createProxyMiddleware({
             });
         }
     }
-});
-
-// 健康检查端点（Render必需）
-app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
-        service: 'gateway',
-        backendUrl: BACKEND_URL,
-        timestamp: new Date().toISOString()
-    });
 });
 
 app.use('/api', backendProxy);
