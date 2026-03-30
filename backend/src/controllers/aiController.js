@@ -13,15 +13,16 @@ module.exports = {
             const result = aiService.getAIContentList(page, pageSize, startTime, endTime);
 
             res.json({
-                success: true,
-                data: result,
-                timestamp: Date.now()
+                code: 0,
+                message: 'success',
+                data: result
             });
         } catch (error) {
             console.error('获取AI内容列表失败:', error);
             res.status(500).json({
-                success: false,
-                message: '获取AI内容列表失败: ' + error.message
+                code: -1,
+                message: '获取AI内容列表失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -39,14 +40,16 @@ module.exports = {
             const result = aiService.getFormattedAIContentList(page, pageSize, startTime, endTime);
 
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: result
             });
         } catch (error) {
             console.error('获取AI内容列表失败:', error);
             res.status(500).json({
-                success: false,
-                message: '获取AI内容列表失败: ' + error.message
+                code: -1,
+                message: '获取AI内容列表失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -56,14 +59,15 @@ module.exports = {
         try {
             const content = aiService.getAIContentById(req.params.id);
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: content
             });
         } catch (error) {
             res.status(404).json({
-                success: false,
-                error: '内容不存在',
-                message: error.message
+                code: -1,
+                message: '内容不存在',
+                data: null
             });
         }
     },
@@ -73,14 +77,15 @@ module.exports = {
         try {
             const newContent = aiService.addAIContent(req.body);
             res.json({
-                success: true,
+                code: 0,
+                message: '添加成功',
                 data: newContent
             });
         } catch (error) {
             res.status(400).json({
-                success: false,
-                error: '添加AI内容失败',
-                message: error.message
+                code: -1,
+                message: '添加AI内容失败',
+                data: null
             });
         }
     },
@@ -90,14 +95,15 @@ module.exports = {
         try {
             const updatedContent = aiService.updateAIContent(req.params.id, req.body);
             res.json({
-                success: true,
+                code: 0,
+                message: '更新成功',
                 data: updatedContent
             });
         } catch (error) {
             res.status(400).json({
-                success: false,
-                error: '更新AI内容失败',
-                message: error.message
+                code: -1,
+                message: '更新AI内容失败',
+                data: null
             });
         }
     },
@@ -110,15 +116,16 @@ module.exports = {
             const result = aiService.getAIContentComments(req.params.id, page, pageSize);
 
             res.json({
-                success: true,
-                data: result,
-                timestamp: Date.now()
+                code: 0,
+                message: 'success',
+                data: result
             });
         } catch (error) {
             console.error('获取AI内容评论列表失败:', error);
             res.status(500).json({
-                success: false,
-                message: '获取评论列表失败: ' + error.message
+                code: -1,
+                message: '获取评论列表失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -131,14 +138,16 @@ module.exports = {
             const result = aiService.getFormattedAIContentComments(req.params.id, page, pageSize);
 
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: result
             });
         } catch (error) {
             console.error('获取AI内容评论列表失败:', error);
             res.status(500).json({
-                success: false,
-                message: '获取评论列表失败: ' + error.message
+                code: -1,
+                message: '获取评论列表失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -156,16 +165,16 @@ module.exports = {
             console.log(`🗑️  已删除评论: ${req.params.commentId}, 原因: ${reason || '管理员删除'}`);
 
             res.json({
-                success: true,
-                data: result,
+                code: 0,
                 message: '评论已删除',
-                timestamp: Date.now()
+                data: result
             });
         } catch (error) {
             console.error('删除评论失败:', error);
             res.status(500).json({
-                success: false,
-                message: '删除评论失败: ' + error.message
+                code: -1,
+                message: '删除评论失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -182,21 +191,21 @@ module.exports = {
 
             console.log(`🗑️  已删除评论: ${req.params.commentId}, 原因: ${reason || '管理员删除'}`);
 
-            // 按照文档格式返回响应
             res.json({
-                success: true,
+                code: 0,
+                message: '评论已删除',
                 data: {
                     commentId: req.params.commentId,
                     contentId: req.params.id,
                     deleteTime: null
-                },
-                message: '评论已删除'
+                }
             });
         } catch (error) {
             console.error('删除评论失败:', error);
             res.status(500).json({
-                success: false,
-                message: '删除评论失败: ' + error.message
+                code: -1,
+                message: '删除评论失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -206,11 +215,16 @@ module.exports = {
         try {
             const status = aiService.getAIStatus();
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: status
             });
         } catch (error) {
-            res.status(500).json({ error: '获取AI内容失败' });
+            res.status(500).json({
+                code: -1,
+                message: '获取AI内容失败',
+                data: null
+            });
         }
     }
 };

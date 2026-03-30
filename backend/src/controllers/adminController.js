@@ -8,15 +8,16 @@ module.exports = {
         try {
             const debate = mockService.debate.get();
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: debate
             });
         } catch (error) {
             console.error('获取辩论设置失败:', error);
             res.status(500).json({
-                success: false,
-                error: '获取失败',
-                message: error.message
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     },
@@ -26,15 +27,16 @@ module.exports = {
         try {
             const debate = mockService.debate.update(req.body);
             res.json({
-                success: true,
+                code: 0,
+                message: '更新成功',
                 data: debate
             });
         } catch (error) {
             console.error('更新辩论设置失败:', error);
             res.status(500).json({
-                success: false,
-                error: '更新失败',
-                message: error.message
+                code: -1,
+                message: '更新失败',
+                data: null
             });
         }
     },
@@ -44,15 +46,16 @@ module.exports = {
         try {
             const users = mockService.users.getAll();
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: users
             });
         } catch (error) {
             console.error('获取用户列表失败:', error);
             res.status(500).json({
-                success: false,
-                error: '获取失败',
-                message: error.message
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     },
@@ -63,20 +66,22 @@ module.exports = {
             const user = mockService.users.getById(req.params.id);
             if (!user) {
                 return res.status(404).json({
-                    success: false,
-                    error: '用户不存在'
+                    code: -1,
+                    message: '用户不存在',
+                    data: null
                 });
             }
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: user
             });
         } catch (error) {
             console.error('获取用户失败:', error);
             res.status(500).json({
-                success: false,
-                error: '获取失败',
-                message: error.message
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     },

@@ -124,10 +124,27 @@ function initWebSocket() {
 		
 		ws.onmessage = (event) => {
 			try {
-				const message = JSON.parse(event.data);
-				handleWebSocketMessage(message);
+				let messageData = event.data;
+				
+				// 如果是 Blob 类型，先读取为文本
+				if (messageData instanceof Blob) {
+					const reader = new FileReader();
+					reader.onload = () => {
+						try {
+							const message = JSON.parse(reader.result);
+							handleWebSocketMessage(message);
+						} catch (error) {
+							console.error('WebSocket 消息解析失败:', error);
+						}
+					};
+					reader.readAsText(messageData);
+				} else {
+					// 直接解析字符串
+					const message = JSON.parse(messageData);
+					handleWebSocketMessage(message);
+				}
 			} catch (error) {
-				console.error('WebSocket 消息解析失败:', error);
+				console.error('WebSocket 消息处理失败:', error);
 			}
 		};
 		

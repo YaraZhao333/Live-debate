@@ -7,15 +7,16 @@ module.exports = {
         try {
             const votes = voteService.getVotes();
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: votes
             });
         } catch (error) {
             console.error('获取票数失败:', error);
             res.status(500).json({
-                success: false,
-                error: '获取票数失败',
-                message: error.message
+                code: -1,
+                message: '获取票数失败',
+                data: null
             });
         }
     },
@@ -27,15 +28,16 @@ module.exports = {
             const updatedVotes = voteService.updateVotes(leftVotes, rightVotes);
 
             res.json({
-                success: true,
+                code: 0,
+                message: '更新成功',
                 data: updatedVotes
             });
         } catch (error) {
             console.error('修改票数失败:', error);
             res.status(400).json({
-                success: false,
-                error: '修改票数失败',
-                message: error.message
+                code: -1,
+                message: '修改票数失败',
+                data: null
             });
         }
     },
@@ -45,15 +47,16 @@ module.exports = {
         try {
             voteService.resetVotes();
             res.json({
-                success: true,
-                message: '票数已重置'
+                code: 0,
+                message: '票数已重置',
+                data: null
             });
         } catch (error) {
             console.error('重置票数失败:', error);
             res.status(500).json({
-                success: false,
-                error: '重置票数失败',
-                message: error.message
+                code: -1,
+                message: '重置票数失败',
+                data: null
             });
         }
     }

@@ -6,13 +6,17 @@ module.exports = {
     getLiveStatus: (req, res) => {
         try {
             const status = liveService.getLiveStatus();
-            res.json(status);
+            res.json({
+                code: 0,
+                message: 'success',
+                data: status
+            });
         } catch (error) {
             console.error('获取直播状态失败:', error);
             res.status(500).json({
-                success: false,
-                error: '获取失败',
-                message: error.message
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     },
@@ -24,16 +28,19 @@ module.exports = {
             const result = liveService.controlLive(action, streamUrl);
 
             res.json({
-                success: true,
-                status: result.isLive ? 'started' : 'stopped',
-                streamUrl: result.streamUrl
+                code: 0,
+                message: '操作成功',
+                data: {
+                    status: result.isLive ? 'started' : 'stopped',
+                    streamUrl: result.streamUrl
+                }
             });
         } catch (error) {
             console.error('控制直播状态失败:', error);
             res.status(400).json({
-                success: false,
-                error: '操作失败',
-                message: error.message
+                code: -1,
+                message: '操作失败',
+                data: null
             });
         }
     },
@@ -45,7 +52,7 @@ module.exports = {
             const result = liveService.controlLive(action, null, streamId);
 
             res.json({
-                success: true,
+                code: 0,
                 message: result.isLive ? '直播已开始' : '直播已停止',
                 data: {
                     status: result.isLive ? 'started' : 'stopped',
@@ -56,8 +63,9 @@ module.exports = {
         } catch (error) {
             console.error('用户控制直播状态失败:', error);
             res.status(400).json({
-                success: false,
-                message: '操作失败: ' + error.message
+                code: -1,
+                message: '操作失败: ' + error.message,
+                data: null
             });
         }
     },
@@ -67,16 +75,16 @@ module.exports = {
         try {
             const schedule = liveService.setLiveSchedule(req.body);
             res.json({
-                success: true,
+                code: 0,
                 message: '直播计划已设置',
                 data: schedule
             });
         } catch (error) {
             console.error('设置直播计划失败:', error);
             res.status(400).json({
-                success: false,
-                error: '设置失败',
-                message: error.message
+                code: -1,
+                message: '设置失败',
+                data: null
             });
         }
     },
@@ -86,13 +94,15 @@ module.exports = {
         try {
             const schedule = liveService.getLiveSchedule();
             res.json({
-                success: true,
+                code: 0,
+                message: 'success',
                 data: schedule
             });
         } catch (error) {
             res.status(500).json({
-                success: false,
-                error: '获取失败'
+                code: -1,
+                message: '获取失败',
+                data: null
             });
         }
     },
@@ -102,13 +112,15 @@ module.exports = {
         try {
             liveService.cancelLiveSchedule();
             res.json({
-                success: true,
-                message: '直播计划已取消'
+                code: 0,
+                message: '直播计划已取消',
+                data: null
             });
         } catch (error) {
             res.status(500).json({
-                success: false,
-                error: '取消失败'
+                code: -1,
+                message: '取消失败',
+                data: null
             });
         }
     },
@@ -120,16 +132,16 @@ module.exports = {
             const isSchedule = !req.body.startNow;
 
             res.json({
-                success: true,
+                code: 0,
                 message: isSchedule ? '直播计划已设置' : '直播已开始',
                 data: result
             });
         } catch (error) {
             console.error('设置并开始直播失败:', error);
             res.status(400).json({
-                success: false,
-                error: '操作失败',
-                message: error.message
+                code: -1,
+                message: '操作失败',
+                data: null
             });
         }
     },
