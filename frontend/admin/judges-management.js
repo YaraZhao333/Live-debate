@@ -479,16 +479,6 @@ function showNotification(message, type = 'info') {
 	alert(message);
 }
 
-/**
- * 获取API基础地址
- */
-function getAPIBase() {
-	if (window.SERVER_CONFIG && window.SERVER_CONFIG.BASE_URL) {
-		return window.SERVER_CONFIG.BASE_URL;
-	}
-	return 'http://localhost:8081';
-}
-
 // 导出函数供外部使用
 if (typeof window !== 'undefined') {
 	window.initJudgesManagement = initJudgesManagement;
