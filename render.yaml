@@ -1,7 +1,7 @@
 services:
   # 后端服务
   - type: web
-    name: live-debate-backend
+    name: live-debate
     runtime: node
     plan: free
     buildCommand: cd backend && npm install
@@ -9,27 +9,4 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 8081
-    healthCheckPath: /api/admin/votes
-
-  # 网关服务
-  - type: web
-    name: live-debate-gateway
-    runtime: node
-    plan: free
-    buildCommand: cd gateway && npm install
-    startCommand: cd gateway && npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 10000
-      - key: BACKEND_PORT
-        value: 8081
-      - key: BACKEND_URL
-        fromService:
-          name: live-debate-backend
-          type: web
-          property: hostport
-    healthCheckPath: /api/admin/votes
+    healthCheckPath: /health
