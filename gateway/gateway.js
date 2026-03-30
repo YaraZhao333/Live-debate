@@ -37,12 +37,63 @@ app.options('*', (req, res) => {
 
 app.use(express.json());
 
-// 前端静态资源服务 - 指向构建后的 H5 目录
-app.use(express.static(path.join(__dirname, '../frontend/unpackage/dist/build/web')));
-
-// 前端首页路由
+// 前端首页路由 - 创建一个简单的欢迎页面
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/unpackage/dist/build/web/index.html'));
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>直播辩论系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 直播辩论系统</h1>
+        <p style="color: #666; margin-bottom: 30px;">欢迎使用直播辩论管理系统</p>
+        <a href="/admin" class="btn">进入后台管理</a>
+        <a href="/api/admin/votes" class="btn" style="background: #28a745;">测试API接口</a>
+    </div>
+</body>
+</html>
+    `);
 });
 
 // 后台管理页面路由
