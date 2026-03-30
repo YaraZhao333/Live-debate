@@ -2,9 +2,8 @@ const { app, server } = require('./app');
 const serverCfg = require('../config/server-mode.node.js');
 const { getCurrentServerConfig, printConfig } = serverCfg;
 
-// 获取服务器配置
-const currentConfig = getCurrentServerConfig();
-const port = currentConfig.port || 8080;
+// 获取服务器配置 - 优先使用环境变量 PORT
+const port = process.env.PORT || 8081;
 
 // 启动服务器
 server.listen(port, () => {

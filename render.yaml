@@ -23,8 +23,6 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: BACKEND_PORT
-        value: 8081
       - key: BACKEND_URL
         fromService:
           name: live-debate-backend
