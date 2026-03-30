@@ -36,11 +36,12 @@ app.get('/', (req, res) => {
     res.redirect('/admin');
 });
 
-// 后台管理页面路由
+// 后台管理页面路由 - 使用 frontend 目录下的完整文件
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../admin', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../frontend/admin', 'index.html'));
 });
-app.use('/admin', express.static(path.join(__dirname, '../admin')));
+app.use('/admin', express.static(path.join(__dirname, '../../frontend/admin')));
+app.use('/static', express.static(path.join(__dirname, '../../frontend/static')));
 
 // API路由挂载
 app.use('/api', voteRoutes);
