@@ -52,6 +52,34 @@ const mockData = {
 		}
 	],
 	
+	votes: {
+		leftVotes: 45,
+		rightVotes: 55,
+		total: 100,
+		updatedAt: new Date().toISOString()
+	},
+	
+	userVotes: [],
+	
+	aiContent: [
+		{
+			id: uuidv4(),
+			position: 'left',
+			content: '关于"如果有一个能一键消除痛苦的按钮，你会按吗？"，我认为会按这个按钮。痛苦是阻碍人类进步的主要障碍之一。',
+			timestamp: Date.now() - 60000,
+			likes: 12,
+			comments: []
+		},
+		{
+			id: uuidv4(),
+			position: 'right',
+			content: '关于"如果有一个能一键消除痛苦的按钮，你会按吗？"，我认为不会按这个按钮。痛苦是成长的重要组成部分。',
+			timestamp: Date.now() - 30000,
+			likes: 8,
+			comments: []
+		}
+	],
+	
 	statistics: {
 		totalVotes: 8,
 		totalUsers: 2,
@@ -237,6 +265,112 @@ const statistics = {
 	}
 };
 
+// 投票管理
+const votes = {
+	get: () => mockData.votes,
+	
+	update: (leftVotes, rightVotes) => {
+		mockData.votes.leftVotes = leftVotes;
+		mockData.votes.rightVotes = rightVotes;
+		mockData.votes.total = leftVotes + rightVotes;
+		mockData.votes.updatedAt = new Date().toISOString();
+		return mockData.votes;
+	},
+	
+	reset: () => {
+		mockData.votes.leftVotes = 50;
+		mockData.votes.rightVotes = 50;
+		mockData.votes.total = 100;
+		mockData.votes.updatedAt = new Date().toISOString();
+		return mockData.votes;
+	}
+};
+
+// 用户投票管理
+const userVotes = {
+	getAll: () => mockData.userVotes,
+	
+	getByUserId: (userId) => {
+		return mockData.userVotes.filter(uv => uv.userId === userId);
+	},
+	
+	add: (userVote) => {
+		const newUserVote = {
+			id: uuidv4(),
+			...userVote,
+			createdAt: new Date().toISOString()
+		};
+		mockData.userVotes.push(newUserVote);
+		return newUserVote;
+	}
+};
+
+// AI内容管理
+const aiContent = {
+	getAll: () => mockData.aiContent,
+	
+	getById: (id) => {
+		return mockData.aiContent.find(c => c.id === id);
+	},
+	
+	add: (contentData) => {
+		const newContent = {
+			id: uuidv4(),
+			...contentData,
+			timestamp: Date.now(),
+			likes: 0,
+			comments: []
+		};
+		mockData.aiContent.unshift(newContent);
+		return newContent;
+	},
+	
+	like: (contentId) => {
+		const content = mockData.aiContent.find(c => c.id === contentId);
+		if (content) {
+			content.likes = (content.likes || 0) + 1;
+		}
+		return content;
+	},
+	
+	addComment: (contentId, comment) => {
+		const content = mockData.aiContent.find(c => c.id === contentId);
+		if (content) {
+			const newComment = {
+				id: uuidv4(),
+				...comment,
+				createdAt: new Date().toISOString(),
+				likes: 0
+			};
+			content.comments.push(newComment);
+			return newComment;
+		}
+		return null;
+	},
+	
+	deleteComment: (contentId, commentId) => {
+		const content = mockData.aiContent.find(c => c.id === contentId);
+		if (content) {
+			const originalLength = content.comments.length;
+			content.comments = content.comments.filter(c => c.id !== commentId);
+			return content.comments.length < originalLength;
+		}
+		return false;
+	},
+	
+	likeComment: (contentId, commentId) => {
+		const content = mockData.aiContent.find(c => c.id === contentId);
+		if (content) {
+			const comment = content.comments.find(c => c.id === commentId);
+			if (comment) {
+				comment.likes = (comment.likes || 0) + 1;
+				return comment;
+			}
+		}
+		return null;
+	}
+};
+
 // 直播计划管理
 const liveSchedule = {
 	get: () => mockData.liveSchedule,
@@ -309,6 +443,9 @@ module.exports = {
 	streams,
 	debate,
 	users,
+	votes,
+	userVotes,
+	aiContent,
 	statistics,
 	liveSchedule,
 	generateAIDebateContent,

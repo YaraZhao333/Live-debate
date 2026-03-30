@@ -1,11 +1,12 @@
-const voteService = require('../services/voteService');
+const mockService = require('../services/mockService');
+const { broadcast } = require('../websocket/wsServer');
 
 // 票数相关控制器
 module.exports = {
     // 获取当前票数
     getVotes: (req, res) => {
         try {
-            const votes = voteService.getVotes();
+            const votes = mockService.votes.get();
             res.json({
                 code: 0,
                 message: 'success',
@@ -25,7 +26,12 @@ module.exports = {
     updateVotes: (req, res) => {
         try {
             const { leftVotes, rightVotes } = req.body;
-            const updatedVotes = voteService.updateVotes(leftVotes, rightVotes);
+            const updatedVotes = mockService.votes.update(leftVotes, rightVotes);
+
+            broadcast('vote-updated', {
+                votes: updatedVotes,
+                updatedBy: 'admin'
+            });
 
             res.json({
                 code: 0,
@@ -45,7 +51,14 @@ module.exports = {
     // 重置票数
     resetVotes: (req, res) => {
         try {
-            voteService.resetVotes();
+            const resetVotes = mockService.votes.reset();
+
+            broadcast('vote-updated', {
+                votes: resetVotes,
+                updatedBy: 'admin',
+                action: 'reset'
+            });
+
             res.json({
                 code: 0,
                 message: '票数已重置',

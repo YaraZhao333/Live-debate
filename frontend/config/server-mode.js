@@ -21,9 +21,9 @@ const USE_MOCK_SERVER = false; // 使用真实服务器
  * 真实服务器地址
  * 当 USE_MOCK_SERVER = false 时使用
  */
-export const LOCAL_SERVER_URL = 'http://localhost:8080';
-export const MIDDLEWARE_SERVER_URL = 'http://192.168.31.249:8081';  // 中间层服务器地址（直接连接 server.js，避免与 nginx 冲突）
-export const REAL_SERVER_URL = 'http://192.140.160.119:8000';  // 真实后端服务器地址
+export const LOCAL_SERVER_URL = 'http://localhost:10000';
+export const MIDDLEWARE_SERVER_URL = 'http://localhost:10000';
+export const REAL_SERVER_URL = 'http://localhost:10000';
 
 /**
  * 真实服务器端口（如果需要）
@@ -53,8 +53,8 @@ const getLocalIP = () => {
  */
 const MOCK_SERVER_CONFIG = {
     host: getLocalIP(),
-    port: 8080,
-    url: `http://${getLocalIP()}:8080`
+    port: 10000,
+    url: `http://${getLocalIP()}:10000`
 };
 
 /**

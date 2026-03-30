@@ -1,11 +1,11 @@
 {
   "name": "live-debate-gateway",
   "version": "2.0.0",
-  "description": "直播辩论 - 中间层网关服务",
-  "main": "gateway.js",
+  "description": "直播辩论 - 网关代理服务",
+  "main": "gateway-proxy.js",
   "scripts": {
-    "start": "node gateway.js",
-    "dev": "nodemon gateway.js"
+    "start": "node gateway-proxy.js",
+    "dev": "nodemon gateway-proxy.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
