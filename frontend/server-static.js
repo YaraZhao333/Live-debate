@@ -2,16 +2,35 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const http = require('http');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
+//网关线上地址
+const GATEWAY_URL = 'https://live-debate-gateway.onrender.com';
 
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true
+}));
+// =====================================================================
+// ✅【核心修复】代理 /api 和 /ws 到线上网关
+// =====================================================================
+app.use('/api', createProxyMiddleware({
+    target: GATEWAY_URL,
+    changeOrigin: true,
+    secure: true,
+    ws: true
+}));
+
+app.use('/ws', createProxyMiddleware({
+    target: GATEWAY_URL,
+    changeOrigin: true,
+    secure: true,
+    ws: true
 }));
 
 app.use(express.static(path.join(__dirname, 'unpackage/dist/build/web')));
