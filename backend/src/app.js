@@ -34,6 +34,14 @@ app.use(cors({
 // 解析JSON请求体
 app.use(express.json());
 
+// 全局缓存控制中间件 - 禁用缓存
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
+
 // 配置WebSocket
 setupWebSocketServer(server);
 
