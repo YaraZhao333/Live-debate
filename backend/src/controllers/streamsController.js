@@ -211,6 +211,46 @@ const streamsController = {
 				data: null
 			});
 		}
+	},
+
+	// 获取RTMP转HLS播放地址
+	getRtmpToHlsUrls: (req, res) => {
+		try {
+			const roomName = req.query.room_name;
+			
+			if (!roomName) {
+				return res.status(400).json({
+					code: -1,
+					message: '房间名称不能为空',
+					data: null
+				});
+			}
+			
+			// 模拟返回RTMP转HLS的地址
+			// 实际项目中，这里应该调用真实的转码服务
+			const pushUrl = `rtmp://localhost/live/${roomName}`;
+			const playFlv = `http://localhost:8080/live/${roomName}.flv`;
+			const playHls = `http://localhost:8080/live/${roomName}/index.m3u8`;
+			
+			res.json({
+				code: 0,
+				message: 'success',
+				success: true,
+				data: {
+					room_name: roomName,
+					push_url: pushUrl,
+					play_flv: playFlv,
+					play_hls: playHls
+				}
+			});
+		} catch (error) {
+			console.error('获取RTMP转HLS地址失败:', error);
+			res.status(500).json({
+				code: -1,
+				message: '获取RTMP转HLS地址失败',
+				data: null
+			});
+		}
 	}
 };
 

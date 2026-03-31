@@ -3452,9 +3452,17 @@
 					// 监听消息接收
 					this.socketTask.onMessage((res) => {
 						try {
-							const data = JSON.parse(res.data);
+							let messageData = res.data;
+							// 检查是否是 ArrayBuffer 类型
+							if (res.data instanceof ArrayBuffer) {
+								// 将 ArrayBuffer 转换为字符串
+								const decoder = new TextDecoder('utf-8');
+								messageData = decoder.decode(res.data);
+							}
+							const data = JSON.parse(messageData);
 							this.handleWSMessage(data);
 						} catch (error) {
+							console.error('❌ 解析 WebSocket 消息失败:', error);
 						}
 					});
 					
