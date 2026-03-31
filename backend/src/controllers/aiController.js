@@ -2,6 +2,75 @@ const aiService = require('../services/aiService');
 
 // AI相关控制器
 module.exports = {
+    // 启动AI识别
+    startAI: (req, res) => {
+        try {
+            const { streamId, settings, notifyUsers = true } = req.body;
+            console.log('🚀 收到启动AI识别请求:', { streamId, settings });
+            
+            const result = aiService.startAI(streamId, settings);
+            
+            res.json({
+                code: 0,
+                message: 'AI识别已启动',
+                data: result
+            });
+        } catch (error) {
+            console.error('启动AI识别失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '启动AI识别失败',
+                data: null
+            });
+        }
+    },
+
+    // 停止AI识别
+    stopAI: (req, res) => {
+        try {
+            const { streamId, saveHistory = true, notifyUsers = true } = req.body;
+            console.log('🛑 收到停止AI识别请求:', { streamId });
+            
+            const result = aiService.stopAI(streamId);
+            
+            res.json({
+                code: 0,
+                message: 'AI识别已停止',
+                data: result
+            });
+        } catch (error) {
+            console.error('停止AI识别失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '停止AI识别失败',
+                data: null
+            });
+        }
+    },
+
+    // 切换AI状态（暂停/恢复）
+    toggleAI: (req, res) => {
+        try {
+            const { action, notifyUsers = true } = req.body;
+            console.log('🔄 收到切换AI状态请求:', { action });
+            
+            const streamId = req.body.streamId;
+            const result = aiService.toggleAI(action, streamId);
+            
+            res.json({
+                code: 0,
+                message: 'AI状态已更新',
+                data: result
+            });
+        } catch (error) {
+            console.error('切换AI状态失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '切换AI状态失败',
+                data: null
+            });
+        }
+    },
     // 获取AI内容列表
     getAIContentList: (req, res) => {
         try {

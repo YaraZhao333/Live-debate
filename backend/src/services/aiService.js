@@ -8,7 +8,11 @@ const {
     getGlobalAIStatus,
     updateAIStatus,
     getDebateTopic,
-    updateDebateTopic
+    updateDebateTopic,
+    getAIStatusForStream,
+    startAI,
+    stopAI,
+    toggleAI
 } = require('../state/aiState');
 const { broadcast } = require('../websocket/wsServer');
 
@@ -270,5 +274,44 @@ module.exports = {
         });
 
         return updatedTopic;
+    },
+
+    // 获取指定流的AI状态
+    getAIStatusForStream: (streamId) => {
+        return getAIStatusForStream(streamId);
+    },
+
+    // 启动AI识别
+    startAI: (streamId, settings = {}) => {
+        const result = startAI(streamId, settings);
+        broadcast('ai-status-changed', {
+            streamId: streamId,
+            status: 'running',
+            aiSessionId: result.aiSessionId,
+            timestamp: new Date().toISOString()
+        });
+        return result;
+    },
+
+    // 停止AI识别
+    stopAI: (streamId) => {
+        const result = stopAI(streamId);
+        broadcast('ai-status-changed', {
+            streamId: streamId,
+            status: 'stopped',
+            timestamp: new Date().toISOString()
+        });
+        return result;
+    },
+
+    // 切换AI状态（暂停/恢复）
+    toggleAI: (action, streamId) => {
+        const result = toggleAI(action, streamId);
+        broadcast('ai-status-changed', {
+            streamId: streamId,
+            status: result.status,
+            timestamp: new Date().toISOString()
+        });
+        return result;
     }
 };

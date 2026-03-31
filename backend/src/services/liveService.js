@@ -2,6 +2,7 @@ const { getGlobalLiveStatus, updateGlobalLiveStatus, resetLiveStatus } = require
 const { broadcast } = require('../websocket/wsServer');
 const { startScheduleCheck, stopLive } = require('../scheduler/liveScheduler');
 const mockService = require('./mockService');
+const voteService = require('./voteService');
 
 // 直播相关服务
 module.exports = {
@@ -235,5 +236,126 @@ module.exports = {
 
             return schedule;
         }
+    },
+
+    // 开始直播
+    startLive: (streamId, autoStartAI = false, notifyUsers = true) => {
+        if (!streamId) {
+            throw new Error('streamId 是必填参数');
+        }
+
+        const stream = mockService.streams.getById(streamId);
+        if (!stream) {
+            throw new Error('指定的直播流不存在');
+        }
+        if (!stream.enabled) {
+            throw new Error('指定的直播流未启用');
+        }
+
+        updateGlobalLiveStatus({
+            isLive: true,
+            streamUrl: stream.url,
+            streamId: streamId,
+            liveId: 'live-' + Date.now(),
+            liveStartTime: new Date().toISOString(),
+            isScheduled: false,
+            scheduledStartTime: null,
+            scheduledEndTime: null
+        });
+
+        mockService.liveSchedule.clear();
+
+        if (notifyUsers) {
+            broadcast('live-started', {
+                liveId: 'live-' + Date.now(),
+                streamUrl: stream.url,
+                streamId: streamId,
+                timestamp: Date.now()
+            });
+        }
+
+        return {
+            isLive: true,
+            streamUrl: stream.url,
+            streamId: streamId,
+            liveId: 'live-' + Date.now(),
+            liveStartTime: new Date().toISOString()
+        };
+    },
+
+    // 停止直播
+    stopLive: (streamId, saveStatistics = true, notifyUsers = true) => {
+        stopLive();
+
+        if (notifyUsers) {
+            broadcast('live-stopped', {
+                streamId: streamId,
+                timestamp: Date.now()
+            });
+        }
+
+        return {
+            isLive: false,
+            streamId: streamId
+        };
+    },
+
+    // 更新投票
+    updateVotes: (action, leftVotes, rightVotes, reason = '', notifyUsers = true, streamId = null) => {
+        let votes = voteService.getVotes();
+
+        if (action === 'set') {
+            votes = voteService.setVotes(leftVotes, rightVotes);
+        } else if (action === 'add') {
+            votes = voteService.addVotes(leftVotes, rightVotes);
+        } else if (action === 'reset') {
+            votes = voteService.resetVotes();
+        }
+
+        if (notifyUsers) {
+            broadcast('votes-updated', {
+                leftVotes: votes.leftVotes,
+                rightVotes: votes.rightVotes,
+                streamId: streamId,
+                timestamp: Date.now()
+            });
+        }
+
+        return votes;
+    },
+
+    // 重置投票
+    resetVotes: (leftVotes = 0, rightVotes = 0, saveBackup = true, notifyUsers = true, streamId = null) => {
+        const votes = voteService.setVotes(leftVotes, rightVotes);
+
+        if (notifyUsers) {
+            broadcast('votes-updated', {
+                leftVotes: votes.leftVotes,
+                rightVotes: votes.rightVotes,
+                streamId: streamId,
+                timestamp: Date.now()
+            });
+        }
+
+        return votes;
+    },
+
+    // 广播观看人数
+    broadcastViewers: (streamId) => {
+        const viewers = Math.floor(Math.random() * 200) + 50;
+
+        broadcast('viewersCount', {
+            streamId: streamId,
+            data: {
+                count: viewers,
+                action: 'manual_broadcast'
+            }
+        });
+
+        return {
+            streamId: streamId,
+            viewers: viewers,
+            message: '观看人数已广播'
+        };
     }
 };

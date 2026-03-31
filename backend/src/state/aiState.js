@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-// AI状态管理
+// AI状态管理（支持多流）
 let globalAIStatus = {
     status: 'stopped',  // stopped / running / paused
     aiSessionId: null,
@@ -16,6 +16,28 @@ let globalAIStatus = {
         totalWords: 0,
         averageConfidence: 0
     }
+};
+
+// 按流ID存储的AI状态
+let streamAIStatus = {};
+
+// 获取或创建流的AI状态
+const getStreamAIStatus = (streamId) => {
+    if (!streamId) return globalAIStatus;
+    if (!streamAIStatus[streamId]) {
+        streamAIStatus[streamId] = {
+            status: 'stopped',
+            aiSessionId: null,
+            streamId: streamId,
+            startTime: null,
+            settings: {
+                mode: 'realtime',
+                sensitivity: 'high',
+                minConfidence: 0.7
+            }
+        };
+    }
+    return streamAIStatus[streamId];
 };
 
 // AI辩论内容存储
@@ -34,6 +56,39 @@ module.exports = {
     updateAIStatus: (updates) => {
         globalAIStatus = { ...globalAIStatus, ...updates };
         return { ...globalAIStatus };
+    },
+    // 获取指定流的AI状态
+    getAIStatusForStream: (streamId) => {
+        return { ...getStreamAIStatus(streamId) };
+    },
+    // 启动AI识别
+    startAI: (streamId, settings = {}) => {
+        const status = getStreamAIStatus(streamId);
+        status.status = 'running';
+        status.aiSessionId = uuidv4();
+        status.startTime = new Date().toISOString();
+        if (settings.mode) status.settings.mode = settings.mode;
+        if (settings.sensitivity) status.settings.sensitivity = settings.sensitivity;
+        if (settings.minConfidence) status.settings.minConfidence = settings.minConfidence;
+        return { ...status };
+    },
+    // 停止AI识别
+    stopAI: (streamId) => {
+        const status = getStreamAIStatus(streamId);
+        status.status = 'stopped';
+        status.aiSessionId = null;
+        status.startTime = null;
+        return { ...status };
+    },
+    // 切换AI状态（暂停/恢复）
+    toggleAI: (action, streamId) => {
+        const status = getStreamAIStatus(streamId);
+        if (action === 'pause') {
+            status.status = 'paused';
+        } else if (action === 'resume') {
+            status.status = 'running';
+        }
+        return { ...status };
     },
     getAIDebateContent: () => [...aiDebateContent],
     getAIDebateContentById: (id) => aiDebateContent.find(item => item.id === id),
