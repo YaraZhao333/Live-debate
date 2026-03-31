@@ -85,34 +85,28 @@
 		// 页面卸载
 	},
 	methods: {
-		// 处理登录
-		handleLogin() {
-			try {
-				console.log('开始登录流程')
-				
-				// 显示 Loading 动画
-				this.isLoading = true
-				
-				// 初始化 Loading 动画
-				this.$nextTick(() => {
-					this.initLoadingLottie()
-				})
+		async handleLogin() {
+		try {
+			console.log('开始登录流程')
+			
+			// 显示 Loading 动画
+			this.isLoading = true
+			
+			// 初始化 Loading 动画
+			this.$nextTick(() => {
+				this.initLoadingLottie()
+			})
 
-				// ⚡ 临时方案：跳过微信登录，直接进入小程序
-				this.bypassWechatLogin()
-			} catch (error) {
-				console.error('登录处理失败:', error)
-				this.isLoading = false
-				uni.showToast({
-					title: error.message || '登录失败',
-					icon: 'none',
-					duration: 2000
-				})
-			}
-		},
-		// 空实现，避免报错
-		initLoadingLottie() {
-			console.log('初始化 Loading 动画')
+			// ⚡ 临时方案：跳过微信登录，直接进入小程序
+			await this.bypassWechatLogin()
+		} catch (error) {
+			console.error('登录处理失败:', error)
+			this.isLoading = false
+			uni.showToast({
+				title: error.message || '登录失败',
+				icon: 'none',
+				duration: 2000
+			})
 		}
 	},
 	
@@ -422,7 +416,13 @@
 			})
 		},
 		
-		}  
+		// 初始化加载动画（空实现，避免报错）
+		initLoadingLottie() {
+			console.log('初始化加载动画（空实现）')
+		}
+		
+		}
+	}
 </script>
 
 <style>

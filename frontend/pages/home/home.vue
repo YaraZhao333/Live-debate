@@ -890,12 +890,7 @@
 			}, 1500);
 		},
 		methods: {
-				// 空实现，避免报错
-				initFireAnimation() {
-					console.log('初始化火焰动画')
-				},
-				
-				// ==================== 播放器配置方法 ====================
+			// ==================== 播放器配置方法 ====================
 
 			/**
 			 * 根据流格式获取播放器模式
@@ -3201,6 +3196,16 @@
 		closeModal() {
 			this.showModal = false;
 			this.selectedMessage = null;
+		},
+		
+		// 初始化火焰动画（空实现，避免报错）
+		initFireAnimation() {
+			console.log('初始化火焰动画（空实现）');
+		},
+		
+		// 初始化按钮动画（空实现，避免报错）
+		initButtonAnimations() {
+			console.log('初始化按钮动画（空实现）');
 		},
 		
 		// 为消息添加评论

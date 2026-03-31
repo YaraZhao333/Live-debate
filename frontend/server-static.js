@@ -27,20 +27,6 @@ app.get('/api/votes', (req, res) => {
     res.redirect(307, redirectUrl);
 });
 
-// 兼容 RTMP 转 HLS API
-app.get('/api/v1/admin/rtmp/urls', (req, res) => {
-    const roomName = req.query.room_name || 'default';
-    res.json({
-        success: true,
-        data: {
-            room_name: roomName,
-            push_url: `rtmp://localhost/live/${roomName}`,
-            play_flv: `http://localhost:8086/live/${roomName}.flv`,
-            play_hls: `http://localhost:8086/live/${roomName}.m3u8`
-        }
-    });
-});
-
 app.use('/api', createProxyMiddleware({
     target: GATEWAY_URL,
     changeOrigin: true,
@@ -75,20 +61,6 @@ app.get('/health', (req, res) => {
         status: 'ok', 
         service: 'frontend',
         timestamp: new Date().toISOString()
-    });
-});
-
-// 兼容 RTMP 转 HLS API
-app.get('/api/v1/admin/rtmp/urls', (req, res) => {
-    const roomName = req.query.room_name || 'default';
-    res.json({
-        success: true,
-        data: {
-            room_name: roomName,
-            push_url: `rtmp://localhost/live/${roomName}`,
-            play_flv: `http://localhost:8086/live/${roomName}.flv`,
-            play_hls: `http://localhost:8086/live/${roomName}.m3u8`
-        }
     });
 });
 
