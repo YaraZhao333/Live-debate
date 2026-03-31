@@ -2,7 +2,6 @@ services:
   - type: web
     name: live-debate-backend
     runtime: node
-    plan: free
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     envVars:
@@ -14,7 +13,6 @@ services:
   - type: web
     name: live-debate-gateway
     runtime: node
-    plan: free
     buildCommand: cd gateway && npm install
     startCommand: cd gateway && npm start
     envVars:
@@ -28,7 +26,6 @@ services:
   - type: web
     name: live-debate-frontend
     env: static
-    plan: free
     buildCommand: ""
     staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true
@@ -36,7 +33,6 @@ services:
   - type: web
     name: live-debate-admin
     env: static
-    plan: free
     buildCommand: ""
     staticPublishPath: frontend/admin
     autoDeploy: true
