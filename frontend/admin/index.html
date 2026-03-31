@@ -4,36 +4,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>直播辩论小程序 - 后台管理系统</title>
-	<link rel="icon" href="/static/iconfont/zhibo.png">
-	<link rel="stylesheet" href="/admin/styles.css">
+	
+	<link rel="stylesheet" href="./styles.css">
 	<!-- <link rel="stylesheet" href="/static/iconfont/iconfont.css"> -->
-	<style>
-		/* 图标样式 */
-		.icon-img {
-			width: 20px;
-			height: 20px;
-			vertical-align: middle;
-			margin-right: 8px;
-			object-fit: contain;
-		}
-		.icon-img-sm {
-			width: 16px;
-			height: 16px;
-		}
-		.icon-img-lg {
-			width: 24px;
-			height: 24px;
-		}
-		.icon-inline {
-			display: inline-block;
-			vertical-align: middle;
-		}
-		/* 防止浏览器默认样式干扰 */
-		a, a:link, a:visited, a:hover, a:active {
-			text-decoration: none;
-			color: inherit;
-		}
-	</style>
+	
 </head>
 <body>
 	<div id="app">
@@ -41,42 +15,42 @@
 		<aside class="sidebar">
 			<div class="sidebar-header">
 				<h2>
-					<img src="/static/iconfont/zhibo.png" class="icon-img" alt="">
+					🎥
 					直播辩论管理
 				</h2>
 			</div>
 			<nav class="sidebar-nav">
 				<a href="#dashboard" class="nav-item active" data-page="dashboard">
-					<img src="/static/iconfont/shuju.png" class="nav-icon-img" alt="">
+					📊
 					<span class="nav-text">数据概览</span>
 				</a>
 				<a href="#stream-manage" class="nav-item" data-page="stream-manage">
-					<img src="/static/iconfont/live.png" class="nav-icon-img" alt="">
+					📺
 					<span class="nav-text">直播流管理</span>
 				</a>
 
 				<a href="#users" class="nav-item" data-page="users">
-					<img src="/static/iconfont/blue-user.png" class="nav-icon-img" alt="">
+					👤
 					<span class="nav-text">用户管理</span>
 				</a>
 				<a href="#votes" class="nav-item" data-page="votes">
-					<img src="/static/iconfont/toupiao.png" class="nav-icon-img" alt="">
+					🗳️
 					<span class="nav-text">票数管理</span>
 				</a>
 			<a href="#judges" class="nav-item" data-page="judges">
-				<img src="/static/iconfont/blue-user.png" class="nav-icon-img" alt="">
+				👤
 				<span class="nav-text">评委管理</span>
 			</a>
 			<a href="#debate-flow" class="nav-item" data-page="debate-flow">
-				<img src="/static/iconfont/gongjigongju.png" class="nav-icon-img" alt="">
+				⚙️
 				<span class="nav-text">辩论流程</span>
 			</a>
 			<a href="#ai-content" class="nav-item" data-page="ai-content">
-					<img src="/static/iconfont/gongjigongju.png" class="nav-icon-img" alt="">
+					⚙️
 					<span class="nav-text">AI 内容管理</span>
 				</a>
 				<a href="#statistics" class="nav-item" data-page="statistics">
-					<img src="/static/iconfont/shuju.png" class="nav-icon-img" alt="">
+					📊
 					<span class="nav-text">数据统计</span>
 				</a>
 			</nav>
@@ -104,11 +78,11 @@
 				<div class="multi-live-overview" style="background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1);">
 					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 						<h3 style="margin: 0; color: white; font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/zhibo.png" class="icon-img" style="filter: brightness(0) invert(1);" alt="">
+							🎥
 							多直播流总览
 						</h3>
 						<button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 6px; padding: 8px 16px; transition: all 0.3s;" onclick="refreshMultiLiveOverview()" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-							<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+							🔄
 							刷新
 						</button>
 					</div>
@@ -122,7 +96,7 @@
 				<div class="stats-grid">
 						<div class="stat-card">
 							<div class="stat-icon">
-								<img src="/static/iconfont/blue-user.png" alt="用户">
+								👤
 							</div>
 							<div class="stat-info">
 								<div class="stat-value" id="total-users">0</div>
@@ -131,7 +105,7 @@
 						</div>
 						<div class="stat-card">
 							<div class="stat-icon">
-								<img src="/static/iconfont/zhibo.png" alt="直播">
+								🎥
 							</div>
 							<div class="stat-info">
 								<div class="stat-value" id="live-status">未开播</div>
@@ -140,7 +114,7 @@
 						</div>
 						<div class="stat-card">
 							<div class="stat-icon">
-								<img src="/static/iconfont/toupiao.png" alt="投票">
+								🗳️
 							</div>
 							<div class="stat-info">
 								<div class="stat-value" id="total-votes">0</div>
@@ -149,7 +123,7 @@
 						</div>
 						<div class="stat-card">
 							<div class="stat-icon">
-								<img src="/static/iconfont/guankanrenshu.png" alt="在线">
+								👥
 							</div>
 							<div class="stat-info">
 								<div class="stat-value" id="active-users">0</div>
@@ -168,7 +142,7 @@
 				<div id="live-setup" class="page">
 					<div class="page-header">
 						<h2>
-							<img src="/static/iconfont/zhibo.png" class="icon-img" alt="">
+							🎥
 							直播控制
 						</h2>
 					</div>
@@ -186,7 +160,7 @@
 					<!-- 直播流选择 -->
 					<div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
 						<h4 style="margin: 0 0 15px 0; color: #333; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/live.png" class="icon-img" alt="">
+							📺
 							选择直播流
 						</h4>
 						<div style="display: flex; flex-direction: column; gap: 10px;">
@@ -209,7 +183,7 @@
 					<!-- 直播流信息 -->
 					<div id="live-stream-info" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: none; border: 1px solid #e9ecef;">
 						<h4 style="margin: 0 0 15px 0; color: #333; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/zhibo.png" class="icon-img" alt="">
+							🎥
 							当前直播信息
 						</h4>
 						<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px 20px; font-size: 14px;">
@@ -225,7 +199,7 @@
 					<!-- 控制按钮 -->
 					<div style="display: flex; gap: 15px; justify-content: center;">
 							<button class="btn btn-success" id="admin-start-live-btn" style="padding: 15px 40px; font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center;">
-								<img src="/static/iconfont/bofang.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+								▶️
 								开始直播
 							</button>
 							<button class="btn btn-danger" id="admin-stop-live-btn" style="padding: 15px 40px; font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center;" disabled>
@@ -246,7 +220,7 @@
 					<!-- 所有直播流状态列表 - 显示每个直播流的开始与停止情况 -->
 					<div id="streams-status-container" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;">
 						<h4 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/shuju.png" class="icon-img" alt="">
+							📊
 							所有直播流状态
 						</h4>
 						<div id="all-streams-status" style="display: flex; flex-direction: column; gap: 15px;">
@@ -261,7 +235,7 @@
 				<div id="stream-manage" class="page">
 					<div class="page-header">
 						<h2>
-							<img src="/static/iconfont/live.png" class="icon-img" alt="">
+							📺
 							直播流管理
 						</h2>
 						<button class="btn btn-primary" id="add-stream-btn" style="display: flex; align-items: center; gap: 6px;">
@@ -354,8 +328,8 @@
 			<div id="votes" class="page">
 				<div class="page-header">
 					<h2>票数管理</h2>
-					<a href="/admin/vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
-						<img src="/static/iconfont/zhibo.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+					<a href="./vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+						🎥
 						打开大屏幕
 					</a>
 				</div>
@@ -364,7 +338,7 @@
 					<div style="background: #d1ecf1; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #3498db; border: 1px solid #bee5eb;">
 						<div class="form-group" style="margin: 0;">
 							<label style="display: block; margin-bottom: 10px; color: #0c5460; font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-								<img src="/static/iconfont/live.png" class="icon-img" alt="">
+								📺
 								选择直播流
 								<span style="color: #e74c3c; margin-left: 5px;">*</span>
 							</label>
@@ -373,7 +347,7 @@
 									<option value="">请选择要管理的直播流</option>
 								</select>
 								<button class="btn btn-secondary btn-sm" id="votes-refresh-streams-btn" style="padding: 12px 20px; display: flex; align-items: center; gap: 6px;">
-									<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" alt="">
+									🔄
 									刷新列表
 								</button>
 							</div>
@@ -394,27 +368,27 @@
 					<!-- 当前票数显示 -->
 					<div style="margin-bottom: 30px;">
 						<h3 style="margin-bottom: 20px; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/shuju.png" class="icon-img" alt="">
+							📊
 							当前票数
 						</h3>
 						<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
 							<div style="padding: 25px; border: 2px solid #27ae60; border-radius: 8px; text-align: center; background: #d4edda;">
 								<h4 style="margin: 0 0 10px 0; color: #495057; display: flex; align-items: center; justify-content: center; gap: 6px;">
-									<img src="/static/iconfont/fangyudunpai-.png" class="icon-img-sm" alt="">
+									⚔️
 									正方票数
 								</h4>
 								<div id="admin-left-votes" style="font-size: 42px; font-weight: 600; color: #27ae60; margin: 10px 0;">0</div>
 							</div>
 							<div style="padding: 25px; border: 2px solid #3498db; border-radius: 8px; text-align: center; background: #d1ecf1;">
 								<h4 style="margin: 0 0 10px 0; color: #495057; display: flex; align-items: center; justify-content: center; gap: 6px;">
-									<img src="/static/iconfont/fangyudunpai-.png" class="icon-img-sm" alt="">
+									⚔️
 									反方票数
 								</h4>
 								<div id="admin-right-votes" style="font-size: 42px; font-weight: 600; color: #3498db; margin: 10px 0;">0</div>
 							</div>
 							<div style="padding: 25px; border: 2px solid #34495e; border-radius: 8px; text-align: center; background: #ecf0f1;">
 								<h4 style="margin: 0 0 10px 0; color: #495057; display: flex; align-items: center; justify-content: center; gap: 6px;">
-									<img src="/static/iconfont/toupiao.png" class="icon-img-sm" alt="">
+									🗳️
 									总票数
 								</h4>
 								<div id="admin-total-votes" style="font-size: 42px; font-weight: 600; color: #34495e; margin: 10px 0;">0</div>
@@ -511,11 +485,11 @@
 				<div id="judges" class="page">
 					<div class="page-header">
 						<h2>
-							<img src="/static/iconfont/blue-user.png" class="icon-img" alt="">
+							👤
 							评委管理
 						</h2>
-						<a href="/admin/vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
-							<img src="/static/iconfont/zhibo.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+						<a href="./vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+							🎥
 							查看大屏幕
 						</a>
 					</div>
@@ -524,7 +498,7 @@
 					<div style="background: #d1ecf1; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #3498db; border: 1px solid #bee5eb;">
 						<div class="form-group" style="margin: 0;">
 							<label style="display: block; margin-bottom: 10px; color: #0c5460; font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-								<img src="/static/iconfont/live.png" class="icon-img" alt="">
+								📺
 								选择直播流
 								<span style="color: #e74c3c; margin-left: 5px;">*</span>
 							</label>
@@ -533,7 +507,7 @@
 									<option value="">请选择要管理的直播流</option>
 								</select>
 								<button class="btn btn-secondary btn-sm" id="judges-refresh-streams-btn" style="padding: 12px 20px; display: flex; align-items: center; gap: 6px;">
-									<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" alt="">
+									🔄
 									刷新列表
 								</button>
 							</div>
@@ -551,7 +525,7 @@
 					<!-- 当前评委展示 -->
 					<div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
 						<h3 style="margin: 0 0 20px 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-							<img src="/static/iconfont/blue-user.png" class="icon-img" alt="">
+							👤
 							当前评委设置
 						</h3>
 
@@ -702,11 +676,11 @@
 				<div id="debate-flow" class="page">
 					<div class="page-header">
 						<h2>
-							<img src="/static/iconfont/gongjigongju.png" class="icon-img" alt="">
+							⚙️
 							辩论流程管理
 						</h2>
-						<a href="/admin/vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
-							<img src="/static/iconfont/zhibo.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+						<a href="./vote-display.html" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+							🎥
 							查看大屏幕
 						</a>
 					</div>
@@ -715,7 +689,7 @@
 					<div style="background: #d1ecf1; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #3498db; border: 1px solid #bee5eb;">
 						<div class="form-group" style="margin: 0;">
 							<label style="display: block; margin-bottom: 10px; color: #0c5460; font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-								<img src="/static/iconfont/live.png" class="icon-img" alt="">
+								📺
 								选择直播流
 								<span style="color: #e74c3c; margin-left: 5px;">*</span>
 							</label>
@@ -724,7 +698,7 @@
 									<option value="">请选择要管理的直播流</option>
 								</select>
 								<button class="btn btn-secondary btn-sm" id="debate-flow-refresh-streams-btn" style="padding: 12px 20px; display: flex; align-items: center; gap: 6px;">
-									<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" alt="">
+									🔄
 									刷新列表
 								</button>
 							</div>
@@ -743,7 +717,7 @@
 					<div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
 						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 							<h3 style="margin: 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-								<img src="/static/iconfont/gongjigongju.png" class="icon-img" alt="">
+								⚙️
 								当前流程设置
 							</h3>
 							<button class="btn btn-info btn-sm" id="add-segment-btn" style="display: flex; align-items: center; gap: 6px;">
@@ -815,7 +789,7 @@
 				<!-- AI识别控制 -->
 				<div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
 					<h3 style="margin: 0 0 20px 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-						<img src="/static/iconfont/gongjigongju.png" class="icon-img" alt="">
+						⚙️
 						AI 识别控制
 					</h3>
 					
@@ -823,7 +797,7 @@
 					<div style="background: #d1ecf1; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db; border: 1px solid #bee5eb;">
 						<div class="form-group" style="margin: 0;">
 							<label style="display: block; margin-bottom: 10px; color: #0c5460; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-								<img src="/static/iconfont/live.png" class="icon-img-sm" alt="">
+								📺
 								选择直播流（必选）
 								<span style="color: #e74c3c; margin-left: 5px;">*</span>
 							</label>
@@ -832,7 +806,7 @@
 									<option value="">请选择要操作的直播流</option>
 								</select>
 								<button class="btn btn-secondary btn-sm" id="ai-refresh-streams-btn" style="padding: 10px 15px; display: flex; align-items: center; gap: 6px;">
-									<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" alt="">
+									🔄
 									刷新列表
 								</button>
 							</div>
@@ -856,7 +830,7 @@
 						</div>
 						<div style="flex: 2; display: flex; gap: 10px; flex-wrap: wrap;">
 							<button class="btn btn-success" id="start-ai-btn" style="padding: 12px 25px; display: flex; align-items: center; gap: 6px; justify-content: center;">
-								<img src="/static/iconfont/bofang.png" class="icon-img-sm" style="filter: brightness(0) invert(1);" alt="">
+								▶️
 								启动 AI 识别
 							</button>
 							<button class="btn btn-danger" id="stop-ai-btn" style="padding: 12px 25px; display: flex; align-items: center; gap: 6px; justify-content: center;" disabled>
@@ -915,7 +889,7 @@
 						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 							<div style="flex: 1;">
 								<h3 style="margin: 0 0 8px 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-									<img src="/static/iconfont/baogaozongjie.png" class="icon-img" alt="">
+									📋
 									AI 生成内容列表
 								</h3>
 								<div id="ai-content-stream-info" style="font-size: 13px; color: #6c757d; padding: 8px 12px; background: #d1ecf1; border-radius: 6px; display: none; border: 1px solid #bee5eb;">
@@ -932,7 +906,7 @@
 									<option value="deleted">已删除</option>
 								</select>
 								<button class="btn btn-secondary" id="refresh-ai-content-btn" style="display: flex; align-items: center; gap: 6px;">
-									<img src="/static/iconfont/shuaxin.png" class="icon-img-sm" alt="">
+									🔄
 									刷新
 								</button>
 							</div>
@@ -1124,7 +1098,7 @@
 		<div style="background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
 			<div style="padding: 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
 				<h3 style="margin: 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-					<img src="/static/iconfont/blue-user.png" class="icon-img" alt="">
+					👤
 					选择用户作为评委
 				</h3>
 				<button id="close-user-modal" style="background: none; border: none; font-size: 28px; color: #95a5a6; cursor: pointer; line-height: 1; padding: 0; width: 30px; height: 30px;">&times;</button>
@@ -1143,11 +1117,11 @@
 		</div>
 	</div>
 
-	<script src="/admin/admin-api.js?v=2"></script>
-	<script src="/admin/admin.js?v=2"></script>
-	<script src="/admin/admin-events.js?v=2"></script>
-	<script src="/admin/stream-management.js?v=2"></script>
-	<script src="/admin/judges-management.js?v=1"></script>
+	<script src="./admin-api.js?v=2"></script>
+	<script src="./admin.js?v=2"></script>
+	<script src="./admin-events.js?v=2"></script>
+	<script src="./stream-management.js?v=2"></script>
+	<script src="./judges-management.js?v=1"></script>
 	<script>
 		// 初始化直播流管理模块
 		document.addEventListener('DOMContentLoaded', () => {
