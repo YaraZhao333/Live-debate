@@ -563,7 +563,7 @@ class ApiService {
     }
 
     return await this.request({
-      url: '/api/comment',
+      url: '/api/v1/admin/comment',
       method: 'POST',
       data: {
         contentId: String(contentId), // 确保是字符串
@@ -594,7 +594,7 @@ class ApiService {
     }
 
     return await this.request({
-      url: '/api/like',
+      url: '/api/v1/admin/like',
       method: 'POST',
       data
     });
@@ -612,7 +612,7 @@ class ApiService {
     }
 
     return await this.request({
-      url: `/api/comment/${commentId}`,
+      url: `/api/v1/admin/comment/${commentId}`,
       method: 'DELETE',
       data: {
         contentId: String(contentId) // 确保是字符串
@@ -749,7 +749,7 @@ class ApiService {
         // 这里我们使用一个简单的请求来测试连接
         // 注意：如果后端有健康检查端点，可以使用它
         await this.request({
-          url: '/api/admin/live/status',
+          url: '/api/v1/admin/live/status',
           method: 'GET'
         });
       }
@@ -812,7 +812,7 @@ class ApiService {
    * @returns {Promise<Object>} { isLive, streamUrl, ... }
    */
   async getLiveStatus() {
-    return this.request({ url: '/api/admin/live/status', method: 'GET' });
+    return this.request({ url: '/api/v1/admin/live/status', method: 'GET' });
   }
 
   /**
@@ -824,7 +824,7 @@ class ApiService {
     // 如果提供了 streamId，使用带参数的API查询特定流的Dashboard
     const url = streamId 
       ? `/api/v1/admin/dashboard?stream_id=${streamId}`
-      : '/api/admin/dashboard';
+      : '/api/v1/admin/dashboard';
     const response = await this.request({ url, method: 'GET' });
     // 如果返回的是包装格式 { success: true, data: {...} }，提取 data 字段
     if (response && response.success && response.data) {
