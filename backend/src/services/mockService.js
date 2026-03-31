@@ -6,8 +6,8 @@ const mockData = {
 		{
 			id: 'mock-stream-1',
 			name: '主直播间',
-			url: 'rtmp://example.com/live/main',
-			type: 'rtmp',
+			url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+			type: 'hls',
 			enabled: true,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()

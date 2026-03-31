@@ -978,6 +978,13 @@
 				if (streamUrl.includes('.m3u8')) {
 					let hlsUrl = streamUrl;
 					
+					// 0. 相对路径拼接为完整URL
+					if (hlsUrl.startsWith('/')) {
+						const apiBaseUrl = service.baseURL || API_BASE_URL;
+						const origin = apiBaseUrl.match(/https?:\/\/[^/]+/);
+						hlsUrl = origin ? `${origin[0]}${hlsUrl}` : hlsUrl;
+					}
+					
 					// 1. 修正 localhost 为真实服务器 IP
 					if (hlsUrl.includes('localhost')) {
 						// 从当前 API_BASE_URL 提取服务器 IP

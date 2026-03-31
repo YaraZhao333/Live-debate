@@ -7,8 +7,7 @@ export default {
 	// ==================== HLS 直播流配置（优化版） ====================
 	
 	// 主直播流地址（默认使用高清）
-	//liveStreamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-	liveStreamUrl:'https://live-debate-backend.onrender.com/live/stream.m3u8',
+	liveStreamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
 	
 	// ==================== 多清晰度支持 ====================
 	// HLS 支持 ABR (自适应比特率)，可以根据网络情况自动切换清晰度

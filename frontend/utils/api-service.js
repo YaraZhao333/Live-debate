@@ -1051,6 +1051,14 @@ class ApiService {
           // 修正 localhost 为真实服务器 IP
           let hlsUrl = urls.play_hls;
 
+          // 0. 相对路径拼接为完整URL
+          if (hlsUrl.startsWith('/')) {
+            const apiBaseUrl = this.baseURL || API_BASE_URL;
+            const origin = apiBaseUrl.match(/https?:\/\/[^/]+/);
+            hlsUrl = origin ? `${origin[0]}${hlsUrl}` : hlsUrl;
+            console.log('🔄 [HLS转换] 相对路径拼接为完整URL:', hlsUrl);
+          }
+
           // 1. 替换 localhost 为真实 IP
           if (hlsUrl.includes('localhost')) {
             // 从当前 API_BASE_URL 提取服务器 IP
@@ -1083,6 +1091,13 @@ class ApiService {
           // 备选方案：如果没有HLS，使用FLV
           console.warn('⚠️ [HLS转换] 无法获取HLS地址，使用FLV作为备选');
           let flvUrl = urls.play_flv;
+
+          // 相对路径拼接为完整URL
+          if (flvUrl.startsWith('/')) {
+            const apiBaseUrl = this.baseURL || API_BASE_URL;
+            const origin = apiBaseUrl.match(/https?:\/\/[^/]+/);
+            flvUrl = origin ? `${origin[0]}${flvUrl}` : flvUrl;
+          }
 
           // 同样的修正逻辑
           if (flvUrl.includes('localhost')) {

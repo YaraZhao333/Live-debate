@@ -82,6 +82,13 @@ const backendProxy = createProxyMiddleware({
 app.use('/api', backendProxy);
 app.use('/api/v1', backendProxy);
 
+// HLS 直播流代理
+app.use('/live', createProxyMiddleware({
+    target: BACKEND_URL,
+    changeOrigin: true,
+    ws: false
+}));
+
 // =========================
 // WebSocket 真实代理（符合测试题要求）
 // =========================

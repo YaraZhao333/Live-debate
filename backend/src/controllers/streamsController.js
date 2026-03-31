@@ -229,8 +229,8 @@ const streamsController = {
 			// 模拟返回RTMP转HLS的地址
 			// 实际项目中，这里应该调用真实的转码服务
 			const pushUrl = `rtmp://localhost/live/${roomName}`;
-			const playFlv = `http://localhost:8080/live/${roomName}.flv`;
-			const playHls = `http://localhost:8080/live/${roomName}/index.m3u8`;
+			const playFlv = `/live/${roomName}.flv`;
+			const playHls = `/live/${roomName}/index.m3u8`;
 			
 			res.json({
 				code: 0,
