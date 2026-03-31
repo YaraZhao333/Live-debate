@@ -193,6 +193,11 @@ function renderStreamsTable(streams) {
 			? `<span class="badge badge-success" title="${escapeHtml(debateTopic.title)}">✓ 已设置</span>`
 			: `<span class="badge badge-secondary">✗ 未设置</span>`;
 		
+		// 安全处理 stream.type
+		const streamType = stream.type || 'unknown';
+		const typeBadgeClass = streamType === 'hls' ? 'success' : streamType === 'rtmp' ? 'warning' : 'info';
+		const typeDisplay = streamType.toUpperCase();
+		
 		return `
 		<tr>
 			<td>${escapeHtml(stream.name)}</td>
@@ -200,8 +205,8 @@ function renderStreamsTable(streams) {
 				${escapeHtml(stream.url)}
 			</td>
 			<td>
-				<span class="badge badge-${stream.type === 'hls' ? 'success' : stream.type === 'rtmp' ? 'warning' : 'info'}">
-					${stream.type.toUpperCase()}
+				<span class="badge badge-${typeBadgeClass}">
+					${typeDisplay}
 				</span>
 			</td>
 			<td>
