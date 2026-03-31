@@ -28,6 +28,7 @@ services:
   - type: web
     name: live-debate-frontend
     env: static
+    plan: free
     buildCommand: ""
     staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true
