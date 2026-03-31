@@ -9,13 +9,10 @@ const SERVER_CONFIG = {
 	BACKEND_URL: 'http://192.140.160.119:8000',
 	// 当前使用的地址（修改这里切换服务器）
 	get BASE_URL() {
-		// 🔧 配置：使用相对路径，通过网关访问
-		return ''; // 使用相对路径，通过网关代理
+		return 'https://live-debate-gateway.onrender.com';
 	},
 	get WEB_SOCKET_URL() {
-		// 🔧 配置：WebSocket 也使用相对路径
-		// 如果真实后端服务器不支持 WebSocket，可以设置为 null 来禁用 WebSocket
-		return ''; // 使用相对路径，通过网关代理
+		return 'https://live-debate-gateway.onrender.com';
 	}
 };
 

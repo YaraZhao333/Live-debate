@@ -80,6 +80,32 @@ const backendProxy = createProxyMiddleware({
 });
 
 app.use('/api', backendProxy);
+
+// 后台管理接口代理
+app.use('/api/v1/admin', createProxyMiddleware({
+    target: BACKEND_URL,
+    changeOrigin: true,
+    pathRewrite: {
+        '^/api/v1/admin': '/api/v1/admin'
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        console.log(`🔄 [Admin代理] ${req.method} ${req.path} -> ${BACKEND_URL}${req.path}`);
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        console.log(`✅ [Admin代理] ${req.path} <- ${proxyRes.statusCode} ${BACKEND_URL}`);
+    },
+    onError: (err, req, res) => {
+        console.error(`❌ [Admin代理错误] ${req.path}:`, err.message);
+        if (!res.headersSent) {
+            res.status(502).json({
+                code: -1,
+                message: '后端服务不可用',
+                data: null
+            });
+        }
+    }
+}));
+
 app.use('/api/v1', backendProxy);
 
 // HLS 直播流代理
