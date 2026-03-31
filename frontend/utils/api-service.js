@@ -644,7 +644,10 @@ class ApiService {
       debateData = response.data;
     } else if (response && response.data) {
       debateData = response.data;
-    } else if (response && typeof response === 'object' && !response.success) {
+    } else if (response && response.code === 0 && response.data) {
+      // 格式: {code: 0, message: 'success', data: {...}}
+      debateData = response.data;
+    } else if (response && typeof response === 'object' && !response.success && response.code === undefined) {
       // 直接返回数据对象
       debateData = response;
     } else {
@@ -827,6 +830,10 @@ class ApiService {
     if (response && response.success && response.data) {
       return response.data;
     }
+    // 如果返回的是 {code: 0, message: 'success', data: {...}} 格式
+    if (response && response.code === 0 && response.data) {
+      return response.data;
+    }
     // 如果直接返回数据，直接返回
     return response;
   }
@@ -897,6 +904,10 @@ class ApiService {
     // 格式5: 直接返回数据对象
     if (response && response.data && Array.isArray(response.data)) {
       return response.data;
+    }
+    // 格式6: {code: 0, message: 'success', data: {streams: [...]}} (后端实际返回格式)
+    if (response && response.code === 0 && response.data && Array.isArray(response.data.streams)) {
+      return response.data.streams;
     }
     console.warn('⚠️ 无法解析直播流列表响应格式:', response);
     return [];
