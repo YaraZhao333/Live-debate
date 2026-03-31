@@ -37,6 +37,6 @@ services:
     name: live-debate-admin
     env: static
     plan: free
-    buildCommand: echo "no build needed"
+    buildCommand: ""
     staticPublishPath: frontend/admin
     autoDeploy: true
