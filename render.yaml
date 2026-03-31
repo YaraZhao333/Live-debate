@@ -32,3 +32,11 @@ services:
     buildCommand: ""
     staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true
+
+  - type: web
+    name: live-debate-admin
+    env: static
+    plan: free
+    buildCommand: echo "no build needed"
+    staticPublishPath: frontend/admin
+    autoDeploy: true
