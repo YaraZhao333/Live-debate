@@ -25,14 +25,8 @@ services:
     healthCheckPath: /health
     autoDeploy: true
 
-  - type: web
+  - type: static
     name: live-debate-frontend
-    runtime: node
-    plan: free
-    buildCommand: cd frontend && npm install
-    startCommand: cd frontend && npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-    healthCheckPath: /health
+    buildCommand: ""
+    staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true
