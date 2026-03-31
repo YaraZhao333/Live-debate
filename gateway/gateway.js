@@ -12,9 +12,8 @@ const app = express();
 const server = http.createServer(app);
 
 // 配置
-const BACKEND_PORT = process.env.BACKEND_PORT || 8081;
 const GATEWAY_PORT = process.env.GATEWAY_PORT || 3000;
-const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8081';
 
 // 跨域配置
 app.use(cors({
@@ -76,9 +75,8 @@ const backendProxy = createProxyMiddleware({
     }
 });
 
-// 在所有路由之前添加代理中间件
+// 只保留一个代理入口即可，覆盖 /api 和 /api/v1
 app.use('/api', backendProxy);
-app.use('/api/v1', backendProxy);
 
 // WebSocket 代理
 const { WebSocketServer } = require('ws');
@@ -98,7 +96,6 @@ function setupWebSocketProxy() {
         console.log('✅ WebSocket客户端已连接:', req.socket.remoteAddress);
         wsClients.add(ws);
 
-        // 发送欢迎消息
         ws.send(JSON.stringify({
             type: 'connected',
             message: '已连接到实时数据服务'
@@ -108,8 +105,6 @@ function setupWebSocketProxy() {
             try {
                 const data = JSON.parse(message);
                 console.log('📨 收到WebSocket消息:', data.type);
-
-                // 转发消息到后端 WebSocket
                 forwardToBackend(data);
             } catch (error) {
                 console.error('WebSocket消息解析失败:', error);
@@ -133,7 +128,7 @@ function setupWebSocketProxy() {
 // 转发消息到后端 WebSocket
 function forwardToBackend(data) {
     const ws = require('ws');
-    // 替换 http 为 ws，https 为 wss
+    // 根据后端实际路径调整，如果后端是 /api/ws 就改成 /api/ws
     const wsBackendUrl = BACKEND_URL.replace(/^http/, 'ws') + '/ws';
     const backendWs = new ws.WebSocket(wsBackendUrl);
 
@@ -142,7 +137,6 @@ function forwardToBackend(data) {
     });
 
     backendWs.on('message', (message) => {
-        // 广播消息给所有前端客户端
         wsClients.forEach(client => {
             if (client.readyState === 1) {
                 client.send(message);
@@ -155,7 +149,6 @@ function forwardToBackend(data) {
     });
 }
 
-// 设置 WebSocket 代理
 setupWebSocketProxy();
 
 // 404 处理

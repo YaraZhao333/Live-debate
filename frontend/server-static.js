@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8080;
 //网关线上地址
-const GATEWAY_URL = 'http://localhost:8081';
+const GATEWAY_URL = 'https://live-debate-gateway.onrender.com';
 
 app.use(cors({
     origin: '*',

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const httpProxy = require('http-proxy');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,12 +13,9 @@ let BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
 
 // 确保 BACKEND_URL 有 http:// 协议
 if (BACKEND_URL && !BACKEND_URL.startsWith('http://') && !BACKEND_URL.startsWith('https://')) {
-    // 如果只提供了主机名，添加协议
     if (BACKEND_URL.indexOf(':') === -1) {
-        // 只有主机名，没有端口，添加默认端口
         BACKEND_URL = `http://${BACKEND_URL}:${BACKEND_PORT}`;
     } else {
-        // 有主机名和端口，只添加协议
         BACKEND_URL = `http://${BACKEND_URL}`;
     }
 }
@@ -27,7 +25,7 @@ console.log('🔧 后端连接配置:', {
     finalUrl: BACKEND_URL
 });
 
-// 健康检查端点（Render必需）- 必须放在最前面
+// 健康检查端点（Render必需）
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'ok', 
@@ -49,13 +47,14 @@ app.use(cors({
 app.options('*', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With', 'Accept', 'Origin');
     res.header('Access-Control-Max-Age', '86400');
     res.sendStatus(204);
 });
 
 app.use(express.json());
 
+// HTTP 代理
 const backendProxy = createProxyMiddleware({
     target: BACKEND_URL,
     changeOrigin: true,
@@ -83,76 +82,26 @@ const backendProxy = createProxyMiddleware({
 app.use('/api', backendProxy);
 app.use('/api/v1', backendProxy);
 
-const { WebSocketServer } = require('ws');
-const wsClients = new Set();
-let wss = null;
+// =========================
+// WebSocket 真实代理（符合测试题要求）
+// =========================
+const wsProxy = httpProxy.createProxyServer({
+    target: BACKEND_URL.replace(/^http/, 'ws'),
+    changeOrigin: true,
+    ws: true
+});
 
-function setupWebSocketProxy() {
-    if (!WebSocketServer) {
-        console.warn('⚠️  WebSocket模块未安装，实时通信功能将不可用。请运行: npm install ws');
-        return;
+// 将 /ws 的 Upgrade 请求转发到后端 /ws
+server.on('upgrade', (req, socket, head) => {
+    if (req.url === '/ws') {
+        console.log('🔄 [WS代理] 前端 /ws -> 后端 /ws');
+        wsProxy.ws(req, socket, head);
+    } else {
+        socket.destroy();
     }
+});
 
-    wss = new WebSocketServer({ server, path: '/ws' });
-
-    wss.on('connection', (ws, req) => {
-        console.log('✅ WebSocket客户端已连接:', req.socket.remoteAddress);
-        wsClients.add(ws);
-
-        ws.send(JSON.stringify({
-            type: 'connected',
-            message: '已连接到实时数据服务'
-        }));
-
-        ws.on('message', (message) => {
-            try {
-                const data = JSON.parse(message);
-                console.log('📨 收到WebSocket消息:', data.type);
-                forwardToBackend(data);
-            } catch (error) {
-                console.error('WebSocket消息解析失败:', error);
-            }
-        });
-
-        ws.on('close', () => {
-            console.log('❌ WebSocket客户端已断开');
-            wsClients.delete(ws);
-        });
-
-        ws.on('error', (error) => {
-            console.error('WebSocket错误:', error);
-            wsClients.delete(ws);
-        });
-    });
-
-    console.log('🔌 WebSocket代理服务器已初始化');
-}
-
-function forwardToBackend(data) {
-    const ws = require('ws');
-    // 替换 http 为 ws，https 为 wss
-    const wsBackendUrl = BACKEND_URL.replace(/^http/, 'ws') + '/ws';
-    const backendWs = new ws.WebSocket(wsBackendUrl);
-
-    backendWs.on('open', () => {
-        backendWs.send(JSON.stringify(data));
-    });
-
-    backendWs.on('message', (message) => {
-        wsClients.forEach(client => {
-            if (client.readyState === 1) {
-                client.send(message);
-            }
-        });
-    });
-
-    backendWs.on('error', (error) => {
-        console.error('后端WebSocket连接错误:', error);
-    });
-}
-
-setupWebSocketProxy();
-
+// 404 处理
 app.use((req, res) => {
     res.status(404).json({
         code: -1,
@@ -161,6 +110,7 @@ app.use((req, res) => {
     });
 });
 
+// 启动服务器
 server.listen(GATEWAY_PORT, '0.0.0.0', () => {
     console.log('═══════════════════════════════════════');
     console.log('🌐 Gateway 网关服务器已启动');
