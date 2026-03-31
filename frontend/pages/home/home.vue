@@ -3198,16 +3198,6 @@
 			this.selectedMessage = null;
 		},
 		
-		// 初始化火焰动画（空实现，避免报错）
-		initFireAnimation() {
-			console.log('初始化火焰动画（空实现）');
-		},
-		
-		// 初始化按钮动画（空实现，避免报错）
-		initButtonAnimations() {
-			console.log('初始化按钮动画（空实现）');
-		},
-		
 		// 为消息添加评论
 		addCommentToMessage(message) {
 			// 关闭评论详情弹窗（如果打开的话），确保评论发表弹窗显示在最上层

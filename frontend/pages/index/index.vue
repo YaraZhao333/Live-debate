@@ -416,11 +416,6 @@
 			})
 		},
 		
-		// 初始化加载动画（空实现，避免报错）
-		initLoadingLottie() {
-			console.log('初始化加载动画（空实现）')
-		}
-		
 		}
 	}
 </script>

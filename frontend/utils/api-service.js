@@ -971,12 +971,7 @@ class ApiService {
       return response;
     } catch (error) {
       console.error('获取RTMP转HLS地址失败:', error);
-      // 优雅处理错误，返回空对象而不是抛出错误
-      return {
-        push_url: '',
-        play_flv: '',
-        play_hls: ''
-      };
+      throw error;
     }
   }
 
