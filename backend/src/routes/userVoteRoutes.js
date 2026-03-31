@@ -4,8 +4,6 @@ const userVoteController = require('../controllers/userVoteController');
 
 // 用户投票路由
 router.post('/user-vote', userVoteController.userVote);
-router.post('/v1/user-vote', userVoteController.userVote);
 router.get('/user-votes', userVoteController.getUserVotes);
-router.get('/v1/user-votes', userVoteController.getUserVotes);
 
 module.exports = router;

@@ -11,9 +11,4 @@ router.put('/admin/ai-content/:id', aiController.updateAIContent);
 router.get('/admin/ai-content/:id/comments', aiController.getAIContentComments);
 router.delete('/admin/ai-content/:id/comments/:commentId', aiController.deleteAIContentComment);
 
-// V1 API路由
-router.get('/v1/admin/ai-content/list', aiController.getFormattedAIContentList);
-router.get('/v1/admin/ai-content/:id/comments', aiController.getFormattedAIContentComments);
-router.delete('/v1/admin/ai-content/:id/comments/:commentId', aiController.deleteFormattedAIContentComment);
-
 module.exports = router;

@@ -14,6 +14,7 @@ const debateTopicRoutes = require('./routes/debateTopicRoutes');
 const aiContentRoutes = require('./routes/aiContentRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const wechatLoginRoutes = require('./routes/wechatLoginRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // 导入WebSocket服务
 const { setupWebSocketServer } = require('./websocket/wsServer');
@@ -56,6 +57,7 @@ app.use('/api', debateTopicRoutes);
 app.use('/api', aiContentRoutes);
 app.use('/api', commentRoutes);
 app.use('/api', wechatLoginRoutes);
+app.use('/api', authRoutes);
 app.use('/api/v1', voteRoutes);
 app.use('/api/v1', liveRoutes);
 app.use('/api/v1', adminRoutes);
@@ -65,5 +67,7 @@ app.use('/api/v1', userVoteRoutes);
 app.use('/api/v1', debateTopicRoutes);
 app.use('/api/v1', aiContentRoutes);
 app.use('/api/v1', commentRoutes);
+app.use('/api/v1', wechatLoginRoutes);
+app.use('/api/v1', authRoutes);
 
 module.exports = { app, server };
