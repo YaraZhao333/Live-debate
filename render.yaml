@@ -29,6 +29,6 @@ services:
     name: live-debate-frontend
     env: static
     plan: free
-    buildCommand: ""
+    buildCommand: cd frontend && npm install && npm run build:h5
     staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true

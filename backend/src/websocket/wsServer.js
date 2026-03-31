@@ -82,11 +82,13 @@ function handleWebSocketMessage(ws, data) {
             }
             break;
         case 'update-debate':
-            // 处理辩论更新
             broadcast('debate-updated', {
                 debate: data.debate,
                 timestamp: Date.now()
             });
+            break;
+        case 'register':
+            ws.send(JSON.stringify({ type: 'register_ack', message: '已注册' }));
             break;
         default:
             console.log('未知的WebSocket消息类型:', data.type);
