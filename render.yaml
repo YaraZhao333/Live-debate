@@ -25,8 +25,9 @@ services:
     healthCheckPath: /health
     autoDeploy: true
 
-  - type: static
+  - type: web
     name: live-debate-frontend
+    env: static
     buildCommand: ""
     staticPublishPath: frontend/unpackage/dist/build/web
     autoDeploy: true
