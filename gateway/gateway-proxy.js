@@ -130,7 +130,9 @@ function setupWebSocketProxy() {
 
 function forwardToBackend(data) {
     const ws = require('ws');
-    const backendWs = new ws.WebSocket(`ws://localhost:${BACKEND_PORT}/ws`);
+    // 替换 http 为 ws，https 为 wss
+    const wsBackendUrl = BACKEND_URL.replace(/^http/, 'ws') + '/ws';
+    const backendWs = new ws.WebSocket(wsBackendUrl);
 
     backendWs.on('open', () => {
         backendWs.send(JSON.stringify(data));

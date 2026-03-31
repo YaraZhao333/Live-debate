@@ -14,7 +14,7 @@ const server = http.createServer(app);
 // 配置
 const BACKEND_PORT = process.env.BACKEND_PORT || 8081;
 const GATEWAY_PORT = process.env.GATEWAY_PORT || 3000;
-const BACKEND_URL = `http://localhost:${BACKEND_PORT}`;
+const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
 
 // 跨域配置
 app.use(cors({
@@ -133,7 +133,9 @@ function setupWebSocketProxy() {
 // 转发消息到后端 WebSocket
 function forwardToBackend(data) {
     const ws = require('ws');
-    const backendWs = new ws.WebSocket(`ws://localhost:${BACKEND_PORT}/ws`);
+    // 替换 http 为 ws，https 为 wss
+    const wsBackendUrl = BACKEND_URL.replace(/^http/, 'ws') + '/ws';
+    const backendWs = new ws.WebSocket(wsBackendUrl);
 
     backendWs.on('open', () => {
         backendWs.send(JSON.stringify(data));
