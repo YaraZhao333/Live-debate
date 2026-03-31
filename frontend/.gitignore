@@ -57,3 +57,6 @@ ngrok.yml
 logs/
 *.log
 pm2-*.log
+
+# ✅ 允许 unpackage 目录被提交（包含前端构建产物）
+!unpackage/
