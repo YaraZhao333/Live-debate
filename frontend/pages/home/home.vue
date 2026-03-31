@@ -716,16 +716,28 @@
 									const targetStream = streams.find(s => s.id === this.streamId);
 									
 								if (targetStream) {
-									// ✅ 优先使用 playUrls.hls，如果没有则使用 url（向后兼容）
-									const streamUrl = targetStream.playUrls?.hls || targetStream.url;
-									// 使用智能转换方法设置HLS流地址
-									await this.setLiveStreamUrlWithHls(streamUrl, targetStream.name);
-									if (targetStream.playUrls?.hls) {
+										// ✅ 优先使用 playUrls.hls，如果没有则使用 url（向后兼容）
+										const streamUrl = targetStream.playUrls?.hls || targetStream.url;
+										// 使用智能转换方法设置HLS流地址
+										await this.setLiveStreamUrlWithHls(streamUrl, targetStream.name);
+										if (targetStream.playUrls?.hls) {
+										} else {
+										}
 									} else {
+										// 没有找到指定的直播流，使用配置文件中的默认值
+										console.log('⚠️ 没有找到指定的直播流，使用配置文件默认值');
+										if (liveConfig.liveStreamUrl) {
+											this.liveStreamUrl = liveConfig.liveStreamUrl;
+											console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
+										}
 									}
-								} else {
-								}
 								} catch (error) {
+									// API调用失败，使用配置文件中的默认值
+									console.error('❌ 获取直播流失败，使用配置文件默认值:', error);
+									if (liveConfig.liveStreamUrl) {
+										this.liveStreamUrl = liveConfig.liveStreamUrl;
+										console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
+									}
 								}
 							} else {
 								// 未指定 streamId，使用默认逻辑
@@ -737,28 +749,41 @@
 									// 优先使用正在使用的流地址，否则使用启用的流地址
 									const streamUrl = dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
 									if (streamUrl) {
-										// 使用智能转换方法设置HLS流地址
-										await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
-										if (dashboardData.activeStreamName) {
+											// 使用智能转换方法设置HLS流地址
+											await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
+											if (dashboardData.activeStreamName) {
+											}
+										} else {
+											// Dashboard 没有流地址，使用配置文件默认值
+											if (liveConfig.liveStreamUrl) {
+												this.liveStreamUrl = liveConfig.liveStreamUrl;
+												console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
+											}
 										}
 									} else {
+										// Dashboard 数据为空，使用配置文件默认值
+										if (liveConfig.liveStreamUrl) {
+											this.liveStreamUrl = liveConfig.liveStreamUrl;
+											console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
+										}
 									}
-								}
 							} catch (dashboardError) {
-								// 最后尝试通过 streams 接口获取
-								try {
-									const streamUrl = await this.fetchActiveStreamFromServerAlternative();
-									if (streamUrl) {
-										// 使用智能转换方法设置HLS流地址
-										await this.setLiveStreamUrlWithHls(streamUrl);
+									// Dashboard API 失败，使用配置文件默认值
+									console.error('❌ Dashboard API 失败，使用配置文件默认值:', dashboardError);
+									if (liveConfig.liveStreamUrl) {
+										this.liveStreamUrl = liveConfig.liveStreamUrl;
+										console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
 									}
-								} catch (streamsError) {
 								}
-							}
 							}
 						}
 					} catch (error) {
-						// 不再使用配置文件默认值，完全依赖接口数据
+						// 整体失败，使用配置文件默认值
+						console.error('❌ 初始化直播流失败，使用配置文件默认值:', error);
+						if (liveConfig.liveStreamUrl) {
+							this.liveStreamUrl = liveConfig.liveStreamUrl;
+							console.log('✅ 使用配置文件默认流地址:', this.liveStreamUrl);
+						}
 					}
 				}, 500); // 延迟500ms，确保API服务已初始化
 			}
