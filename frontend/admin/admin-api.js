@@ -180,9 +180,16 @@ async function apiRequest(endpoint, options = {}) {
 			throw new Error(errorMsg);
 		}
 		
-		// 检查是否有success字段，如果没有但数据存在，可能是旧格式
-		if (data.success === false) {
+		// 检查是否有success字段或者code字段
+		if (data.success === false || (data.code !== undefined && data.code !== 0)) {
 			throw new Error(data.message || '请求失败');
+		}
+		
+		// 如果是 {code: 0, data: ...} 格式，优先处理
+		if (data.code === 0) {
+			const result = data.data !== undefined ? data.data : data;
+			console.log('✅ API 响应成功 (code:0):', result);
+			return result;
 		}
 		
 		// 如果没有success字段但有数据，尝试兼容处理
@@ -697,7 +704,7 @@ async function addStream(streamData) {
  * @returns {Promise<Object|null>}
  */
 async function updateStream(streamId, streamData) {
-	return await apiRequest(`/api/admin/streams/${streamId}`, {
+	return await apiRequest(`/api/v1/admin/streams/${streamId}`, {
 		method: 'PUT',
 		body: JSON.stringify(streamData)
 	});
@@ -709,7 +716,7 @@ async function updateStream(streamId, streamData) {
  * @returns {Promise<Object|null>}
  */
 async function deleteStream(streamId) {
-	return await apiRequest(`/api/admin/streams/${streamId}`, {
+	return await apiRequest(`/api/v1/admin/streams/${streamId}`, {
 		method: 'DELETE'
 	});
 }
@@ -720,7 +727,7 @@ async function deleteStream(streamId) {
  * @returns {Promise<Object|null>}
  */
 async function toggleStream(streamId) {
-	return await apiRequest(`/api/admin/streams/${streamId}/toggle`, {
+	return await apiRequest(`/api/v1/admin/streams/${streamId}/toggle`, {
 		method: 'POST'
 	});
 }
