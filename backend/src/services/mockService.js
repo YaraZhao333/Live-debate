@@ -7,6 +7,7 @@ const mockData = {
 			id: 'mock-stream-1',
 			name: '主直播间',
 			url: 'rtmp://example.com/live/main',
+			type: 'rtmp',
 			enabled: true,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()
@@ -15,6 +16,7 @@ const mockData = {
 			id: 'mock-stream-2',
 			name: '备用直播间',
 			url: 'rtmp://example.com/live/backup',
+			type: 'rtmp',
 			enabled: false,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()
@@ -110,6 +112,7 @@ const streams = {
 	create: (streamData) => {
 		const newStream = {
 			id: uuidv4(),
+			type: 'hls',
 			...streamData,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()
