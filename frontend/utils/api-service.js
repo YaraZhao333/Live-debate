@@ -232,7 +232,7 @@ class ApiService {
     if (!streamId) {
       throw new Error('获取票数必须指定直播流ID (streamId)');
     }
-    const url = `/api/v1/votes?stream_id=${streamId}`;
+    const url = `/api/v1/admin/votes?stream_id=${streamId}`;
     return await this.request({
       url,
       method: 'GET'
@@ -240,7 +240,7 @@ class ApiService {
   }
 
   async getVote(streamId = null) {
-    const url = streamId ? `/api/votes?stream_id=${streamId}` : '/api/votes';
+    const url = streamId ? `/api/v1/admin/votes?stream_id=${streamId}` : '/api/v1/admin/votes';
     return await this.request({
       url,
       method: 'GET'
@@ -347,7 +347,7 @@ class ApiService {
       console.log('📤 最终发送的请求体:', JSON.stringify(requestBody, null, 2));
       
       const response = await this.request({
-        url: '/api/v1/user-vote',
+        url: '/api/v1/admin/user-vote',
         method: 'POST',
         data: requestBody
       });
@@ -855,7 +855,7 @@ class ApiService {
     }
 
     return this.request({
-      url: '/api/live/control',
+      url: '/api/v1/admin/live/control',
       method: 'POST',
       data
     });
@@ -953,7 +953,7 @@ class ApiService {
 
     try {
       const response = await this.request({
-        url: `/api/admin/rtmp/urls?room_name=${encodeURIComponent(roomName)}`,
+        url: `/api/v1/admin/rtmp/urls?room_name=${encodeURIComponent(roomName)}`,
         method: 'GET'
       });
 

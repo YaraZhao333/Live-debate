@@ -1110,7 +1110,8 @@
 							
 							// 确保流地址存在
 							if (!this.liveStreamUrl && dashboardData.liveStreamUrl) {
-								this.liveStreamUrl = dashboardData.liveStreamUrl;
+								// 使用智能转换方法设置HLS流地址
+								await this.setLiveStreamUrlWithHls(dashboardData.liveStreamUrl, dashboardData.activeStreamName);
 							}
 							
 							// 如果还是没有流地址，尝试从数据库获取

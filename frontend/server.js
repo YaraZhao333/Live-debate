@@ -879,6 +879,28 @@ app.get('/api/admin/votes', (req, res) => {
 	}
 });
 
+// 兼容旧版前端构建文件的路由
+app.get('/api/votes', (req, res) => {
+	try {
+		res.json({
+			success: true,
+			data: {
+				leftVotes: currentVotes.leftVotes,
+				rightVotes: currentVotes.rightVotes,
+				totalVotes: currentVotes.leftVotes + currentVotes.rightVotes,
+				leftPercentage: currentVotes.leftVotes + currentVotes.rightVotes > 0
+					? Math.round((currentVotes.leftVotes / (currentVotes.leftVotes + currentVotes.rightVotes)) * 100)
+					: 50,
+				rightPercentage: currentVotes.leftVotes + currentVotes.rightVotes > 0
+					? Math.round((currentVotes.rightVotes / (currentVotes.leftVotes + currentVotes.rightVotes)) * 100)
+					: 50
+			}
+		});
+	} catch (error) {
+		res.status(500).json({ error: '获取票数失败' });
+	}
+});
+
 app.put('/api/admin/votes', (req, res) => {
 	try {
 		const { leftVotes, rightVotes } = req.body;

@@ -19,6 +19,14 @@ app.use(cors({
 // =====================================================================
 // ✅【核心修复】代理 /api 和 /ws 到线上网关
 // =====================================================================
+// 兼容旧版前端构建文件的路由
+app.get('/api/votes', (req, res) => {
+    // 重定向到正确的路径
+    const streamId = req.query.stream_id || '';
+    const redirectUrl = `/api/v1/admin/votes${streamId ? `?stream_id=${streamId}` : ''}`;
+    res.redirect(307, redirectUrl);
+});
+
 app.use('/api', createProxyMiddleware({
     target: GATEWAY_URL,
     changeOrigin: true,
