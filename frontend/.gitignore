@@ -8,8 +8,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # 目录和打包产物
-/dist/
-/build/
+#/dist/
+#/build/
 /.temp/
 .cache/
 coverage/
@@ -58,5 +58,3 @@ logs/
 *.log
 pm2-*.log
 
-# ✅ 允许 unpackage 目录被提交（包含前端构建产物）
-!unpackage/

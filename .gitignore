@@ -36,8 +36,8 @@ Thumbs.db
 .env.*.local
 
 # Build outputs
-dist/
-build/
+#dist/
+#build/
 
 # Temporary files
 *.tmp
