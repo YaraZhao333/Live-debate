@@ -8,9 +8,9 @@ router.get('/votes', (req, res) => {
   const votes = mockService.votes.get();
   res.json({ code: 0, message: 'success', data: votes });
 });
-router.get('/admin/votes', voteController.getVotes);
-router.put('/admin/votes', voteController.updateVotes);
-router.post('/admin/votes/reset', voteController.resetVotes);
-router.get('/admin/votes/statistics', voteController.getVotesStatistics);
+router.get('/votes', voteController.getVotes);
+router.put('/votes', voteController.updateVotes);
+router.post('/votes/reset', voteController.resetVotes);
+router.get('/votes/statistics', voteController.getVotesStatistics);
 
 module.exports = router;
