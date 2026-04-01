@@ -11,13 +11,16 @@ module.exports = {
         try {
             const streamId = req.query.stream_id || req.query.streamId;
             const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
+            const liveStatus = liveService.getLiveStatus();
             
             res.json({
                 code: 0,
                 message: 'success',
                 data: {
-                    status: mockService.live.status,
-                    current_stream: mockService.live.currentStream,
+                    isLive: liveStatus.isLive,
+                    status: liveStatus.isLive ? 'online' : 'offline',
+                    streamUrl: liveStatus.streamUrl,
+                    current_stream: liveStatus.streamId,
                     streamId: streamId,
                     aiStatus: aiStatus.status,
                     timestamp: Date.now()

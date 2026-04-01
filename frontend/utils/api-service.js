@@ -811,8 +811,18 @@ class ApiService {
    * 获取当前直播状态
    * @returns {Promise<Object>} { isLive, streamUrl, ... }
    */
-  async getLiveStatus() {
-    return this.request({ url: '/api/v1/admin/live/status', method: 'GET' });
+   async getLiveStatus() {
+    const response = await this.request({ url: '/api/v1/admin/live/status', method: 'GET' });
+    // 如果返回的是包装格式 { success: true, data: {...} }，提取 data 字段
+    if (response && response.success && response.data) {
+      return response.data;
+    }
+    // 如果返回的是 {code: 0, message: 'success', data: {...}} 格式
+    if (response && response.code === 0 && response.data) {
+      return response.data;
+    }
+    // 如果直接返回数据，直接返回
+    return response;
   }
 
   /**
