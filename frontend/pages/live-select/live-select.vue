@@ -89,7 +89,8 @@ export default {
 			wsConnection: null,
 			reconnectTimer: null,
 			lastRefreshTime: 0,
-			minRefreshInterval: 10000
+			minRefreshInterval: 10000,
+			pollingTimer: null  // 轮询定时器
 		};
 	},
 	
@@ -97,6 +98,7 @@ export default {
 		console.log('📺 直播选择页面加载');
 		this.loadLiveStreams();
 		this.connectWebSocket();
+		this.startPolling();  // 启动轮询
 	},
 	
 	onShow() {
@@ -110,6 +112,7 @@ export default {
 	
 	onUnload() {
 		this.disconnectWebSocket();
+		this.stopPolling();  // 停止轮询
 	},
 	
 	methods: {
@@ -224,6 +227,25 @@ export default {
 			});
 		},
 		
+		// 启动轮询（作为WebSocket的后备）
+		startPolling() {
+			console.log('🔄 启动直播状态轮询');
+			// 每15秒轮询一次
+			this.pollingTimer = setInterval(() => {
+				console.log('🔄 轮询：刷新直播流状态');
+				this.loadLiveStreams();
+			}, 15000);
+		},
+		
+		// 停止轮询
+		stopPolling() {
+			if (this.pollingTimer) {
+				console.log('🛑 停止直播状态轮询');
+				clearInterval(this.pollingTimer);
+				this.pollingTimer = null;
+			}
+		},
+		
 		// WebSocket methods kept minimal for brevity but fully functional
 		connectWebSocket() {
 			try {
@@ -288,6 +310,29 @@ export default {
 							isLive: true,
 							status: 'started',
 							activeUsers: data.activeUsers || 0
+						});
+					});
+				}
+				return;
+			}
+			
+			// 处理 live-stopped 事件（直播停止）
+			if (type === 'live-stopped') {
+				console.log('📡 收到直播停止事件:', data);
+				if (data && data.streamId) {
+					this.updateLiveStatus(data.streamId, {
+						isLive: false,
+						status: 'stopped',
+						activeUsers: 0
+					});
+				} else if (data) {
+					// 如果没有 streamId，尝试更新所有流的状态
+					console.log('📡 没有 streamId，尝试更新所有流为停止状态');
+					this.liveStreams.forEach(stream => {
+						this.updateLiveStatus(stream.id, {
+							isLive: false,
+							status: 'stopped',
+							activeUsers: 0
 						});
 					});
 				}
