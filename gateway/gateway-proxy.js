@@ -20,6 +20,17 @@ process.on('unhandledRejection', (reason, promise) => {
 const app = express();
 const server = http.createServer(app);
 
+// 关键修复：为所有 socket 添加错误处理
+server.on('connection', (socket) => {
+    socket.on('error', (err) => {
+        if (err.code === 'EPIPE' || err.code === 'ECONNRESET') {
+            console.log('⚠️ [Server Socket] 连接被意外关闭，忽略错误');
+            return;
+        }
+        console.error('❌ [Server Socket] 错误:', err.message);
+    });
+});
+
 const BACKEND_PORT = process.env.BACKEND_PORT || 8081;
 const GATEWAY_PORT = process.env.PORT || 10000;
 let BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${BACKEND_PORT}`;
