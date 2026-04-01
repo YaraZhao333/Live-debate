@@ -11,5 +11,6 @@ router.get('/votes', (req, res) => {
 router.get('/admin/votes', voteController.getVotes);
 router.put('/admin/votes', voteController.updateVotes);
 router.post('/admin/votes/reset', voteController.resetVotes);
+router.get('/admin/votes/statistics', voteController.getVotesStatistics);
 
 module.exports = router;
