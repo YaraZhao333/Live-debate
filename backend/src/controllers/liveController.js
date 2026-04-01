@@ -188,7 +188,7 @@ module.exports = {
     // 开始直播
     startLive: (req, res) => {
         try {
-            const { streamId, stream_id, autoStartAI = false, notifyUsers = true } = req.body;
+            const { streamId, stream_id, autoStartAI = true, notifyUsers = true } = req.body;
             const finalStreamId = streamId || stream_id;
             console.log('🚀 收到开始直播请求:', { streamId: finalStreamId, autoStartAI });
             
