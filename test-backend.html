@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后端接口测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 后端接口测试工具</h1>
+    
+    <div class="test-section">
+        <h3>后端地址配置</h3>
+        <input type="text" id="backendUrl" value="https://live-debate-backend.onrender.com" placeholder="后端地址">
+        <button onclick="testHealth()">1️⃣ 测试健康检查</button>
+        <pre id="healthResult"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h3>直播接口测试</h3>
+        <input type="text" id="streamId" value="mock-stream-1" placeholder="直播流ID">
+        <button onclick="testGetStatus()">2️⃣ 获取直播状态</button>
+        <button onclick="testStartLive()">3️⃣ 开始直播</button>
+        <button onclick="testStopLive()">4️⃣ 停止直播</button>
+        <button onclick="testGetViewers()">5️⃣ 获取观看人数</button>
+        <button onclick="testGetVotes()">6️⃣ 获取投票</button>
+        <button onclick="testGetDashboard()">7️⃣ 获取Dashboard</button>
+        <pre id="liveResult"></pre>
+    </div>
+
+    <script>
+        const backendUrl = () => document.getElementById('backendUrl').value;
+        const streamId = () => document.getElementById('streamId').value;
+        
+        function logResult(elementId, text, isError = false) {
+            const el = document.getElementById(elementId);
+            el.className = isError ? 'error' : 'success';
+            el.textContent = text;
+        }
+        
+        async function testHealth() {
+            try {
+                const res = await fetch(backendUrl() + '/health');
+                const data = await res.json();
+                logResult('healthResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('healthResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testGetStatus() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/live/status?stream_id=' + streamId());
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testStartLive() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/live/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stream_id: streamId() })
+                });
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testStopLive() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/live/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stream_id: streamId() })
+                });
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testGetViewers() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/live/viewers?stream_id=' + streamId());
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testGetVotes() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/votes');
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testGetDashboard() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/dashboard?stream_id=' + streamId());
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+    </script>
+</body>
+</html>
