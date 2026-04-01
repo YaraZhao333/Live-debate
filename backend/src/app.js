@@ -103,4 +103,7 @@ app.use('/api/v1', streamDetailRoutes);
 // 辩题路由（前端直接访问，不需要/admin前缀）
 app.use('/api/v1', debateTopicRoutes);
 
+// AI内容路由（前端直接访问，不需要/admin前缀）
+app.use('/api/v1', aiRoutes);
+
 module.exports = { app, server };

@@ -2659,6 +2659,11 @@
 	initButtonAnimations() {
 		// 按钮动画已删除
 	},
+	
+	// 初始化火焰动画（空函数，避免报错）
+	initFireAnimation() {
+		// 火焰动画已删除
+	},
 			
 			
 	// 移除投票特效
