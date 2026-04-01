@@ -79,8 +79,6 @@ const backendProxy = createProxyMiddleware({
     }
 });
 
-app.use('/api', backendProxy);
-
 // 后台管理接口代理
 app.use('/api/v1/admin', createProxyMiddleware({
     target: BACKEND_URL,
@@ -106,7 +104,8 @@ app.use('/api/v1/admin', createProxyMiddleware({
     }
 }));
 
-app.use('/api/v1', backendProxy);
+// 其他API代理
+app.use('/api', backendProxy);
 
 // HLS 直播流代理
 app.use('/live', createProxyMiddleware({
