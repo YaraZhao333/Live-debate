@@ -139,11 +139,25 @@ const wsProxy = httpProxy.createProxyServer({
     ws: true
 });
 
+// WebSocket 代理错误处理（防止 EPIPE 导致崩溃）
+wsProxy.on('error', (err, req, res) => {
+    console.error('❌ [WS代理错误]:', err.message);
+    if (err.code === 'EPIPE' || err.code === 'ECONNRESET') {
+        console.log('⚠️ [WS代理] 连接被意外关闭，忽略错误');
+        return;
+    }
+});
+
 // 将 /ws 的 Upgrade 请求转发到后端 /ws
 server.on('upgrade', (req, socket, head) => {
     if (req.url === '/ws') {
         console.log('🔄 [WS代理] 前端 /ws -> 后端 /ws');
-        wsProxy.ws(req, socket, head);
+        try {
+            wsProxy.ws(req, socket, head);
+        } catch (error) {
+            console.error('❌ [WS代理] 升级请求失败:', error.message);
+            socket.destroy();
+        }
     } else {
         socket.destroy();
     }
