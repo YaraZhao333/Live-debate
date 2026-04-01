@@ -1,5 +1,6 @@
 const liveService = require('../services/liveService');
 const mockService = require('../services/mockService');
+const { broadcast } = require('../websocket/wsServer');
 
 // 全局观看人数，用于波动
 let globalViewers = 123;
@@ -230,6 +231,13 @@ module.exports = {
             
             // 返回前端可播放的 HLS 测试流
             const playHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+            
+            // 广播 live-started 事件给所有 WebSocket 客户端（关键修复）
+            broadcast('live-started', {
+                streamId: finalStreamId,
+                streamUrl: playHls,
+                timestamp: Date.now()
+            });
             
             return res.json({
                 code: 0,

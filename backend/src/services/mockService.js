@@ -214,6 +214,12 @@ const mockData = {
 		topic: '人工智能的未来',
 		speakers: ['专家A', '专家B'],
 		updatedAt: new Date().toISOString()
+	},
+
+	live: {
+		status: 'offline',
+		currentStream: null,
+		updatedAt: new Date().toISOString()
 	}
 };
 
@@ -490,6 +496,30 @@ const liveSchedule = {
 			updatedAt: new Date().toISOString()
 		};
 		return mockData.liveSchedule;
+	},
+	
+	clear: () => {
+		mockData.liveSchedule = {
+			nextLiveTime: null,
+			topic: null,
+			speakers: [],
+			updatedAt: new Date().toISOString()
+		};
+		return mockData.liveSchedule;
+	}
+};
+
+// 直播状态管理
+const live = {
+	get: () => mockData.live,
+	
+	update: (liveData) => {
+		mockData.live = {
+			...mockData.live,
+			...liveData,
+			updatedAt: new Date().toISOString()
+		};
+		return mockData.live;
 	}
 };
 
@@ -590,6 +620,7 @@ module.exports = {
 	userVotes,
 	aiContent,
 	liveSchedule,
+	live,
 	judges,
 	debateFlows,
 	debateFlowControls

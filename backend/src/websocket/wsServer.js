@@ -124,6 +124,18 @@ function setupWebSocketServer(server) {
             timestamp: Date.now()
         }));
 
+        // 如果直播已经开始，发送 live-started 事件（关键修复）
+        if (liveStatus.isLive) {
+            ws.send(JSON.stringify({
+                type: 'live-started',
+                data: {
+                    streamId: liveStatus.streamId,
+                    streamUrl: liveStatus.streamUrl,
+                    timestamp: Date.now()
+                }
+            }));
+        }
+
         // 发送当前状态
         broadcastCurrentState(ws);
 
