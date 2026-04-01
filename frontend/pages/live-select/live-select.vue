@@ -194,9 +194,13 @@ export default {
 		},
 		
 		enterLiveRoom(stream) {
-			// 临时方案：允许进入直播间，即使 isLive 为 false
-			// 因为 Render 的无状态特性可能导致状态不同步
-			console.log('🚪 进入直播间:', stream.id, 'isLive:', stream.isLive);
+			if (!stream.isLive) {
+				uni.showToast({
+					title: '直播未开始',
+					icon: 'none'
+				});
+				return;
+			}
 			uni.navigateTo({
 				url: `/pages/home/home?streamId=${stream.id}`
 			});
