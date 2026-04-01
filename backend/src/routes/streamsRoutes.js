@@ -22,3 +22,4 @@ router.delete('/streams/:id/debate', streamsController.deleteStreamDebate);
 router.get('/rtmp/urls', streamsController.getRtmpToHlsUrls);
 
 module.exports = router;
+ 

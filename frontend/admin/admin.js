@@ -1678,7 +1678,7 @@ async function controlStreamLive(streamId, start) {
 			// 调用 API 开始直播（支持多流并发）
 			const result = await startLive(streamId, autoStartAI, true);
 
-			if (result && (result.success || result.streamUrl || result.status === 'started' || result.data?.status === 'started')) {
+			if (result && (result.status === 'started' || result.data?.status === 'started')) {
 				console.log('✅ 开始直播成功:', result);
 				showNotification(`✅ 直播流 "${streamName}" 已开始！`, 'success');
 

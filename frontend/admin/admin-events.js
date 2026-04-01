@@ -862,7 +862,7 @@ function initLiveControlEvents() {
 					return;
 				}
 				
-				const isLive = dashboard.isLive || false;
+				const isLive = (dashboard.status === 'running' || dashboard.status === 'started') || false;
 				
 				// 更新 globalState 为最新状态
 				if (window.globalState) {
@@ -884,13 +884,13 @@ function initLiveControlEvents() {
 						const streamId = dashboard?.streamId || null;
 						
 						const result = await stopLive(streamId, true, true);
-						// 判断成功：有 success 为 true，或者有 status === 'stopped'，或者 result 不为空且没有错误字段
-						const isSuccess = result && (
-							result.success === true || 
-							result.status === 'stopped' ||
-							result.data?.status === 'stopped' ||
-							(!result.error && !result.message)
-						);
+						// 判断成功：有 status === 'stopped'，或者 result 不为空且没有错误字段，或者 code === 0
+					const isSuccess = result && (
+						result.status === 'stopped' ||
+						result.data?.status === 'stopped' ||
+						(!result.error && !result.message) ||
+						result.code === 0
+					);
 						
 						if (!isSuccess) {
 							// API失败，回滚UI

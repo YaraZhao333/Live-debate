@@ -425,7 +425,7 @@ async function toggleAI(action, notifyUsers = true) {
  * @returns {Promise<Object|null>}
  */
 async function deleteAIContent(contentId, reason = '管理员删除', notifyUsers = true) {
-	return await apiRequest(`/api/admin/ai/content/${contentId}`, {
+	return await apiRequest(`/api/v1/admin/ai/content/${contentId}`, {
 		method: 'DELETE',
 		body: JSON.stringify({
 			reason,
@@ -525,7 +525,7 @@ async function fetchUserList(page = 1, pageSize = 20, filters = {}) {
 		...filters
 	});
 	
-	return await apiRequest(`/api/admin/miniprogram/users?${queryParams}`, {
+	return await apiRequest(`/api/v1/admin/miniprogram/users?${queryParams}`, {
 		method: 'GET'
 	});
 }
@@ -536,7 +536,7 @@ async function fetchUserList(page = 1, pageSize = 20, filters = {}) {
  * @returns {Promise<Object|null>}
  */
 async function fetchVotesStatistics(timeRange = '1h') {
-	return await apiRequest(`/api/admin/votes/statistics?timeRange=${timeRange}`, {
+	return await apiRequest(`/api/v1/admin/votes/statistics?timeRange=${timeRange}`, {
 		method: 'GET'
 	});
 }
@@ -876,7 +876,7 @@ async function getDebateFlowConfig(streamId) {
 	try {
 		console.log(`📡 获取流 ${streamId} 的辩论流程配置...`);
 		
-		const result = await apiRequest(`/api/admin/debate-flow?stream_id=${streamId}`, {
+		const result = await apiRequest(`/api/v1/admin/debate-flow?stream_id=${streamId}`, {
 			method: 'GET'
 		});
 		
@@ -909,7 +909,7 @@ async function saveDebateFlowConfigAPI(streamId, segments) {
 	try {
 		console.log(`📡 保存流 ${streamId} 的辩论流程配置...`);
 		
-		const result = await apiRequest(`/api/admin/debate-flow`, {
+		const result = await apiRequest(`/api/v1/admin/debate-flow`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -938,7 +938,7 @@ async function sendDebateFlowControl(streamId, action) {
 	try {
 		console.log(`📡 发送流 ${streamId} 的流程控制命令: ${action}...`);
 		
-		const result = await apiRequest(`/api/admin/debate-flow/control`, {
+		const result = await apiRequest(`/api/v1/admin/debate-flow/control`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

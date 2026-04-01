@@ -1362,7 +1362,7 @@
 		 */
 		async function loadDebateFlowConfig(streamId) {
 			try {
-				const response = await fetch(`${getAPIBase()}/api/admin/debate-flow?stream_id=${streamId}`);
+				const response = await fetch(`${getAPIBase()}/api/v1/admin/debate-flow?stream_id=${streamId}`);
 				const result = await response.json();
 				
 				if (result && result.segments && Array.isArray(result.segments) && result.segments.length > 0) {
