@@ -185,12 +185,22 @@ export default {
 		},
 		
 		async refreshStreams() {
-			await this.loadLiveStreams();
-			uni.showToast({
-				title: '刷新成功',
-				icon: 'success',
-				duration: 1500
-			});
+			try {
+				console.log('🔄 手动刷新直播流列表');
+				await this.loadLiveStreams();
+				uni.showToast({
+					title: '刷新成功',
+					icon: 'success',
+					duration: 1500
+				});
+			} catch (error) {
+				console.error('❌ 刷新失败:', error);
+				uni.showToast({
+					title: '刷新失败，请重试',
+					icon: 'none',
+					duration: 2000
+				});
+			}
 		},
 		
 		enterLiveRoom(stream) {
