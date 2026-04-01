@@ -7,8 +7,8 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8080;
-//网关线上地址
-const GATEWAY_URL = 'https://live-debate-gateway.onrender.com';
+// 本地后端地址（测试用）
+const GATEWAY_URL = 'http://localhost:8081';
 
 app.use(cors({
     origin: '*',

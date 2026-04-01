@@ -21,9 +21,9 @@ const USE_MOCK_SERVER = false; // 使用真实服务器
  * 真实服务器地址
  * 当 USE_MOCK_SERVER = false 时使用
  */
-export const LOCAL_SERVER_URL = 'https://live-debate-gateway.onrender.com';
-export const MIDDLEWARE_SERVER_URL = 'https://live-debate-gateway.onrender.com';
-export const REAL_SERVER_URL = 'https://live-debate-gateway.onrender.com';
+export const LOCAL_SERVER_URL = 'http://localhost:8081';
+export const MIDDLEWARE_SERVER_URL = 'http://localhost:8081';
+export const REAL_SERVER_URL = 'http://localhost:8081';
 
 /**
  * 真实服务器端口（如果需要）
