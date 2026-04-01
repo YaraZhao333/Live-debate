@@ -433,6 +433,10 @@ function handleWebSocketMessage(message) {
 		case 'pong':
 			// 心跳响应
 			break;
+		case 'heartbeat':
+			// 心跳消息
+			console.log('💓 收到心跳');
+			break;
 		default:
 			console.log('未知的 WebSocket 消息类型:', message.type);
 	}
