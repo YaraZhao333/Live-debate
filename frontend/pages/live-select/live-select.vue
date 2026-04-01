@@ -252,8 +252,32 @@ export default {
 			const { type, streamId, liveId, data } = message;
 			const currentStreamId = streamId || liveId || data?.streamId || data?.liveId;
 			
-			if (type === 'liveStatus' || type === 'live-status-changed') {
-				if (currentStreamId && data) this.updateLiveStatus(currentStreamId, data);
+			if (type === 'liveStatus' || type === 'live-status-changed' || type === 'live-started') {
+				if (currentStreamId && data) {
+					this.updateLiveStatus(currentStreamId, data);
+				}
+			}
+			
+			// 处理 live-started 事件（关键修复）
+			if (type === 'live-started') {
+				console.log('📡 收到直播开始事件:', data);
+				if (data && data.streamId) {
+					this.updateLiveStatus(data.streamId, {
+						isLive: true,
+						activeUsers: data.activeUsers || 0
+					});
+				}
+			}
+			
+			// 处理 live-status 事件（连接时获取当前状态）
+			if (type === 'live-status') {
+				console.log('📡 收到直播状态:', data);
+				if (data && data.streamId) {
+					this.updateLiveStatus(data.streamId, {
+						isLive: data.isLive,
+						activeUsers: data.activeUsers || 0
+					});
+				}
 			}
 		},
 		
