@@ -638,7 +638,7 @@ async function getViewersCount(streamId) {
 		method: 'GET'
 	});
 	
-	console.log(`👥 [getViewersCount] 流 ${streamId} 的观看人数:`, result?.data?.viewers || 0);
+	console.log(`👥 [getViewersCount] 流 ${streamId} 的观看人数:`, result?.viewers || 0);
 	
 	return result;
 }

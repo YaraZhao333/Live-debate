@@ -1,15 +1,26 @@
 const liveService = require('../services/liveService');
 
+// 全局观看人数，用于波动
+let globalViewers = 123;
+
 // 直播相关控制器
 module.exports = {
     // 获取直播状态
     getLiveStatus: (req, res) => {
         try {
-            const status = liveService.getLiveStatus();
+            const streamId = req.query.stream_id || req.query.streamId;
+            const liveStatus = liveService.getLiveStatus();
+            const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
+            
             res.json({
                 code: 0,
-                message: 'success',
-                data: status
+                message: 'ok',
+                data: {
+                    streamId: streamId,
+                    status: liveStatus.isLive ? 'running' : 'stopped',
+                    aiStatus: aiStatus.status,
+                    timestamp: Date.now()
+                }
             });
         } catch (error) {
             console.error('获取直播状态失败:', error);
@@ -149,15 +160,18 @@ module.exports = {
     // 获取观看人数
     getViewersCount: (req, res) => {
         try {
-            const streamId = req.query.stream_id;
-            const viewers = Math.floor(Math.random() * 200) + 50;
+            const streamId = req.query.stream_id || req.query.streamId;
+            
+            // 模拟人数波动
+            globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
+            if (globalViewers < 0) globalViewers = 0;
             
             res.json({
                 code: 0,
-                message: 'success',
+                message: 'ok',
                 data: {
                     streamId: streamId,
-                    viewers: viewers,
+                    viewers: globalViewers,
                     timestamp: Date.now()
                 }
             });
@@ -174,15 +188,22 @@ module.exports = {
     // 开始直播
     startLive: (req, res) => {
         try {
-            const { streamId, autoStartAI = false, notifyUsers = true } = req.body;
-            console.log('🚀 收到开始直播请求:', { streamId, autoStartAI });
+            const { streamId, stream_id, autoStartAI = false, notifyUsers = true } = req.body;
+            const finalStreamId = streamId || stream_id;
+            console.log('🚀 收到开始直播请求:', { streamId: finalStreamId, autoStartAI });
             
-            const result = liveService.startLive(streamId, autoStartAI, notifyUsers);
+            const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
+            const aiStatus = require('../state/aiState').getAIStatusForStream(finalStreamId);
             
             res.json({
                 code: 0,
                 message: '直播已开始',
-                data: result
+                data: {
+                    streamId: finalStreamId,
+                    status: 'running',
+                    aiStatus: aiStatus.status,
+                    timestamp: Date.now()
+                }
             });
         } catch (error) {
             console.error('开始直播失败:', error);
@@ -197,15 +218,22 @@ module.exports = {
     // 停止直播
     stopLive: (req, res) => {
         try {
-            const { streamId, saveStatistics = true, notifyUsers = true } = req.body;
-            console.log('🛑 收到停止直播请求:', { streamId });
+            const { streamId, stream_id, saveStatistics = true, notifyUsers = true } = req.body;
+            const finalStreamId = streamId || stream_id;
+            console.log('🛑 收到停止直播请求:', { streamId: finalStreamId });
             
-            const result = liveService.stopLive(streamId, saveStatistics, notifyUsers);
+            const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
+            const aiStatus = require('../state/aiState').getAIStatusForStream(finalStreamId);
             
             res.json({
                 code: 0,
                 message: '直播已停止',
-                data: result
+                data: {
+                    streamId: finalStreamId,
+                    status: 'stopped',
+                    aiStatus: 'stopped',
+                    timestamp: Date.now()
+                }
             });
         } catch (error) {
             console.error('停止直播失败:', error);
@@ -220,15 +248,19 @@ module.exports = {
     // 更新投票
     updateVotes: (req, res) => {
         try {
-            const { action, leftVotes, rightVotes, reason = '', notifyUsers = true, streamId } = req.body;
-            console.log('📊 收到更新投票请求:', { action, leftVotes, rightVotes, streamId });
+            const { action, leftVotes: L, rightVotes: R, reason = '', notifyUsers = true, streamId } = req.body;
+            console.log('📊 收到更新投票请求:', { action, leftVotes: L, rightVotes: R, streamId });
             
-            const result = liveService.updateVotes(action, leftVotes, rightVotes, reason, notifyUsers, streamId);
+            const result = liveService.updateVotes(action, L, R, reason, notifyUsers, streamId);
             
             res.json({
                 code: 0,
-                message: '投票数已更新',
-                data: result
+                message: '投票更新成功',
+                data: {
+                    leftVotes: result.leftVotes,
+                    rightVotes: result.rightVotes,
+                    timestamp: Date.now()
+                }
             });
         } catch (error) {
             console.error('更新投票失败:', error);
@@ -289,22 +321,25 @@ module.exports = {
     // 获取数据概览
     getDashboard: (req, res) => {
         try {
-            const streamId = req.query.stream_id;
+            const streamId = req.query.stream_id || req.query.streamId;
             console.log('📊 收到数据概览请求:', { streamId });
 
             const liveStatus = liveService.getLiveStatus();
             const votes = require('../services/voteService').getVotes();
             const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
-            const viewers = Math.floor(Math.random() * 200) + 50;
+
+            // 使用全局观看人数，确保与 viewers 接口一致
+            globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
+            if (globalViewers < 0) globalViewers = 0;
 
             const dashboardData = {
                 streamId: streamId,
                 leftVotes: votes.leftVotes,
                 rightVotes: votes.rightVotes,
-                viewers: viewers,
+                viewers: globalViewers,
+                status: liveStatus.isLive ? 'running' : 'stopped',
                 aiStatus: aiStatus.status,
-                isLive: liveStatus.isLive,
-                timestamp: new Date().toISOString()
+                timestamp: Date.now()
             };
 
             res.json({

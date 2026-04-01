@@ -9,8 +9,12 @@ module.exports = {
             const votes = mockService.votes.get();
             res.json({
                 code: 0,
-                message: 'success',
-                data: votes
+                message: 'ok',
+                data: {
+                    leftVotes: votes.leftVotes,
+                    rightVotes: votes.rightVotes,
+                    timestamp: Date.now()
+                }
             });
         } catch (error) {
             console.error('获取票数失败:', error);

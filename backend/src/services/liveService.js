@@ -1,4 +1,4 @@
-const { getGlobalLiveStatus, updateGlobalLiveStatus, resetLiveStatus } = require('../state/liveState');
+const { getGlobalLiveStatus, updateGlobalLiveStatus, resetLiveStatus, updateStreamLiveStatus } = require('../state/liveState');
 const { broadcast } = require('../websocket/wsServer');
 const { startScheduleCheck, stopLive: stopLiveScheduler } = require('../scheduler/liveScheduler');
 const mockService = require('./mockService');
@@ -97,40 +97,84 @@ module.exports = {
             throw new Error('指定的直播流未启用');
         }
 
+        const liveId = 'live-' + Date.now();
+        const liveStartTime = new Date().toISOString();
+
+        // 更新全局状态
         updateGlobalLiveStatus({
             isLive: true,
             streamUrl: stream.url,
             streamId: streamId,
-            liveId: 'live-' + Date.now(),
-            liveStartTime: new Date().toISOString(),
+            liveId: liveId,
+            liveStartTime: liveStartTime,
             isScheduled: false,
             scheduledStartTime: null,
             scheduledEndTime: null
+        });
+
+        // 更新流独立状态
+        updateStreamLiveStatus(streamId, {
+            isLive: true,
+            streamUrl: stream.url,
+            liveId: liveId,
+            liveStartTime: liveStartTime
         });
 
         mockService.liveSchedule.clear();
 
         if (notifyUsers) {
             broadcast('live-started', {
-                liveId: 'live-' + Date.now(),
+                liveId: liveId,
                 streamUrl: stream.url,
                 streamId: streamId,
                 timestamp: Date.now()
             });
         }
 
+        // 如果需要自动启动AI，添加AI状态处理
+        if (autoStartAI) {
+            const aiState = require('../state/aiState');
+            aiState.startAI(streamId);
+        }
+
         return {
             isLive: true,
             streamUrl: stream.url,
             streamId: streamId,
-            liveId: 'live-' + Date.now(),
-            liveStartTime: new Date().toISOString()
+            liveId: liveId,
+            liveStartTime: liveStartTime,
+            success: true,
+            status: 'started'
         };
     },
 
     // 停止直播
     stopLive: (streamId, saveStatistics = true, notifyUsers = true) => {
         stopLiveScheduler();
+
+        // 停止该流的 AI
+        const aiState = require('../state/aiState');
+        aiState.stopAI(streamId);
+
+        // 更新全局状态（只有当停止的是当前活跃流时才更新全局）
+        const globalStatus = getGlobalLiveStatus();
+        if (globalStatus.streamId === streamId) {
+            updateGlobalLiveStatus({
+                isLive: false,
+                streamUrl: null,
+                streamId: null,
+                liveId: null,
+                liveStartTime: null
+            });
+        }
+
+        // 更新流独立状态
+        updateStreamLiveStatus(streamId, {
+            isLive: false,
+            streamUrl: null,
+            liveId: null,
+            liveStartTime: null
+        });
 
         if (notifyUsers) {
             broadcast('live-stopped', {
@@ -141,7 +185,9 @@ module.exports = {
 
         return {
             isLive: false,
-            streamId: streamId
+            streamId: streamId,
+            success: true,
+            status: 'stopped'
         };
     },
 
