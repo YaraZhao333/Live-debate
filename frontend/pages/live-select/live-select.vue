@@ -87,7 +87,9 @@ export default {
 			loading: true,
 			liveStreams: [],
 			wsConnection: null,
-			reconnectTimer: null
+			reconnectTimer: null,
+			lastRefreshTime: 0,
+			minRefreshInterval: 10000
 		};
 	},
 	
@@ -98,7 +100,12 @@ export default {
 	},
 	
 	onShow() {
-		this.refreshStreams();
+		const now = Date.now();
+		if (now - this.lastRefreshTime > this.minRefreshInterval) {
+			this.refreshStreams();
+		} else {
+			console.log('⏳ 刷新间隔过短，跳过刷新');
+		}
 	},
 	
 	onUnload() {
@@ -187,6 +194,7 @@ export default {
 		async refreshStreams() {
 			try {
 				console.log('🔄 手动刷新直播流列表');
+				this.lastRefreshTime = Date.now();
 				await this.loadLiveStreams();
 				uni.showToast({
 					title: '刷新成功',
@@ -255,7 +263,7 @@ export default {
 			this.reconnectTimer = setTimeout(() => {
 				this.reconnectTimer = null;
 				this.connectWebSocket();
-			}, 5000);
+			}, 30000);
 		},
 		
 		handleWebSocketMessage(message) {
