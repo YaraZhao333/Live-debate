@@ -87,8 +87,7 @@ export default {
 			loading: true,
 			liveStreams: [],
 			wsConnection: null,
-			reconnectTimer: null,
-			pollTimer: null  // 轮询定时器
+			reconnectTimer: null
 		};
 	},
 	
@@ -96,38 +95,14 @@ export default {
 		console.log('📺 直播选择页面加载');
 		this.loadLiveStreams();
 		this.connectWebSocket();
-		this.startPolling();  // 启动轮询
 	},
 	
 	onShow() {
 		this.refreshStreams();
-		if (!this.pollTimer) {
-			this.startPolling();  // 页面显示时启动轮询
-		}
 	},
 	
 	onUnload() {
 		this.disconnectWebSocket();
-		this.stopPolling();  // 停止轮询
-	},
-	
-	// 启动轮询（作为 WebSocket 的后备方案）
-	startPolling() {
-		console.log('🔄 启动直播状态轮询');
-		// 每 5 秒轮询一次
-		this.pollTimer = setInterval(() => {
-			console.log('🔄 轮询直播状态...');
-			this.loadLiveStreams();
-		}, 5000);
-	},
-	
-	// 停止轮询
-	stopPolling() {
-		if (this.pollTimer) {
-			clearInterval(this.pollTimer);
-			this.pollTimer = null;
-			console.log('🛑 停止直播状态轮询');
-		}
 	},
 	
 	methods: {
@@ -219,13 +194,9 @@ export default {
 		},
 		
 		enterLiveRoom(stream) {
-			if (!stream.isLive) {
-				uni.showToast({
-					title: '直播未开始',
-					icon: 'none'
-				});
-				return;
-			}
+			// 临时方案：允许进入直播间，即使 isLive 为 false
+			// 因为 Render 的无状态特性可能导致状态不同步
+			console.log('🚪 进入直播间:', stream.id, 'isLive:', stream.isLive);
 			uni.navigateTo({
 				url: `/pages/home/home?streamId=${stream.id}`
 			});
