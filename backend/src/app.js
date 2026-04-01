@@ -94,6 +94,9 @@ app.use('/api/v1/admin', debateFlowRoutes);
 app.use('/api/v1/admin', statisticsRoutes);
 app.use('/api/v1/admin', streamDetailRoutes);
 
+// 前端小程序需要的直播状态接口
+app.use('/api/v1', liveRoutes);
+
 // 辩题路由（前端直接访问，不需要/admin前缀）
 app.use('/api/v1', debateTopicRoutes);
 

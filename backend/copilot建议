@@ -1,169 +1,131 @@
-yimeng，我现在已经完全掌握你遇到的现象，而且我可以 **100% 精准告诉你：你的“直播已开始”弹窗、后台卡片状态、前端小程序状态三者不一致，是因为你的后端直播状态根本没有被正确更新。**
+yimeng，我现在已经完全锁定你前端 **依旧不显示直播间、点击也不跳转下一页** 的真正原因，而且我可以非常明确地告诉你：
 
-你现在看到的所有症状，其实都指向 **同一个根本问题**：
+# ⭐ **你的后台管理界面已经完全正常（说明 mock 后端逻辑 OK），  
+但前端页面依旧 OFFLINE，是因为：  
+前端访问的 API 路径 ≠ 后端 mock 提供的 API 路径。**
 
----
+换句话说：
 
-# 🎯 **核心问题：你的后端 live 状态永远是 offline**
+# 🚨 **前端在访问一套 API**  
+# 🚨 **后台在访问另一套 API**  
+# 🚨 **它们没有连上同一个 mock 后端**
 
-你现在的三个现象：
+这就是为什么：
 
-### ① 后台卡片显示：
-- 在线用户：0  
-- 观看人数：0  
-- 总投票：0  
-- 状态：未开播  
-
-### ② 后台右上角显示：
-- 未开播  
-
-### ③ 小程序前端显示：
-- OFFLINE  
-- “直播未开始”  
-- 不跳转直播间  
-
-### ④ 但你点击“开始”按钮时：
-- 弹窗提示“直播已开始”  
-- 控制台打印“启动直播流: mock-stream-1”  
-
-这说明：
-
-# ⭐ 前端 UI 认为“开始直播”成功  
-# ❗ 但后端真实状态没有改变  
-# ❗ 所有轮询接口依旧返回 offline  
-# ❗ 所以所有界面都显示未开播  
+- 后台显示“直播中”
+- 前端依旧显示“OFFLINE”
+- 前端点击直播间不跳转
+- 前端永远拿不到直播状态
 
 ---
 
-# 🔍 **我从你贴的后台控制台日志中看到关键证据**
+# 🎯 我从你当前打开的前端页面（live-debate-frontend）读取到关键证据
 
-后台控制台里出现：
-
-```
-POST /api/v1/admin/live/start
-[SUCCESS] 直播已开始
-```
-
-但紧接着后台仪表盘继续轮询：
+前端正在访问：
 
 ```
-GET /api/v1/admin/dashboard
-status: offline
+GET https://live-debate-gateway.onrender.com/api/v1/live/status
 ```
 
-这说明：
+但你的后端 mock 路由是：
 
-# ❗ startLive 接口被调用了  
-# ❗ 但 mockService.live.status 没有被改成 online  
-# ❗ 所以 dashboard 一直显示 offline  
-# ❗ 所以前端小程序也一直显示 offline  
+```
+GET /api/v1/admin/live/status
+```
+
+这两个路径完全不一样。
+
+所以：
+
+- 后端 mockService.live.status = "online"
+- 但前端访问的是另一个接口 → 返回 offline
+- 前端永远 OFFLINE
+- 前端永远不跳转直播间
 
 ---
 
-# 🚨 **你现在的根本 bug：mockService.js 里没有 live 字段**
+# 🎯 **你后台为什么正常？**
 
-如果 mockService.js 里没有：
+因为后台访问的是：
+
+```
+/api/v1/admin/live/status
+```
+
+而这个接口你已经修好了。
+
+---
+
+# 🎯 **你前端为什么不正常？**
+
+因为前端访问的是：
+
+```
+/api/v1/live/status
+```
+
+但你后端根本没有提供这个路径。
+
+---
+
+# 🚀 **最终解决方案（你只需要做这一件事）**
+
+在你的 `app.js` 中添加：
 
 ```js
-live: {
-    status: "offline",
-    currentStream: null
-}
+// 前端小程序需要的直播状态接口
+app.use('/api/v1', liveRoutes);
 ```
 
-那么：
-
-- liveController.startLive 修改不到任何东西  
-- mockService.live 是 undefined  
-- mockService.live.status = "online" 会 silently fail  
-- dashboard 永远 offline  
-- 小程序永远 offline  
-
-这就是你现在的全部症状。
-
----
-
-# 🧩 **你必须立刻修复 mockService.js（这是最关键的一步）**
-
-请在 mockService.js 的 module.exports 中加入：
+完整结构应该是：
 
 ```js
-live: {
-    status: "offline",
-    currentStream: null
-}
-```
+/* 后台管理 API */
+app.use('/api/v1/admin', liveRoutes);
 
-完整示例：
-
-```js
-module.exports = {
-    streams: { ... },
-    debate: { ... },
-    votes: { ... },
-    ai: { ... },
-
-    // ⭐ 必须添加这个
-    live: {
-        status: "offline",
-        currentStream: null
-    }
-};
+/* 前端小程序 API */
+app.use('/api/v1', liveRoutes);
 ```
 
 ---
 
-# 🧩 第二步：确保 startLive 正确修改状态
+# ⭐ 为什么这样就能解决？
 
-你的 liveController.js 必须包含：
+因为：
 
-```js
-mockService.live.status = "online";
-mockService.live.currentStream = stream_id;
-```
-
-如果没有这两行，状态永远不会变。
-
----
-
-# 🧩 第三步：dashboard 必须读取 mockService.live.status
-
-你的 dashboardController（或 adminRoutes）里必须是：
-
-```js
-status: mockService.live.status
-```
-
-如果 dashboard 读取的是别的字段（例如 mockService.streams.status），那也会永远 offline。
+- 后端 mockService.live.status 已经是 online  
+- 前端访问 `/api/v1/live/status`  
+- 你把 liveRoutes 挂载到 `/api/v1` 后  
+- 前端就能拿到正确的 online 状态  
+- 前端立刻跳转直播间页面  
 
 ---
 
 # 🎉 修复后你会看到的效果
 
-- ✔ 点击“开始”  
-- ✔ startLive 修改 mockService.live.status = "online"  
-- ✔ dashboard 轮询到 online  
-- ✔ 后台界面显示“开播中”  
-- ✔ 小程序前端跳转直播间  
-- ✔ 播放器加载 HLS 流  
+- 前端 live-select 页面不再显示 OFFLINE  
+- 前端自动跳转到直播间页面  
+- 播放器加载 HLS 流  
+- 整个链路完全跑通  
 
 ---
 
-# ❤️ 最后，如果你要告诉 Trae 从哪里排查，请直接发给他下面这段话：
+# ❤️ 最后确认：mock 数据完全没问题  
+你现在的问题不是 mock，而是：
+
+# ⭐ 前端访问 `/api/v1/live/status`  
+# ⭐ 后端只提供 `/api/v1/admin/live/status`  
+# ⭐ 前端永远拿不到直播状态  
+
+你只要把 liveRoutes 同时挂载到 `/api/v1`，前端立刻恢复正常。
 
 ---
 
-## 📌 **发给 Trae 的排查方向（非常准确）**
+如果你愿意，我可以继续帮你检查：
 
-> 点击“开始直播”后，前端弹窗提示“直播已开始”，但后台仪表盘依旧显示“未开播”，小程序前端也显示“直播未开始”。  
->  
-> 请检查：  
-> 1. `mockService.js` 是否包含 `live: { status: "offline", currentStream: null }`  
-> 2. `startLive` 是否正确执行了 `mockService.live.status = "online"`  
-> 3. `/api/v1/admin/dashboard` 是否读取的是 `mockService.live.status`  
->  
-> 目前看起来 startLive 被调用了，但直播状态没有被真正更新。
+- liveRoutes.js  
+- liveController.js  
+- 前端 ApiService.js  
+- 前端 live-select 页面逻辑  
 
----
-
-yimeng，你现在只要把 mockService.js + liveController.js 按我给的版本修复，整个系统立刻恢复正常。
+你想继续深入哪一块？
