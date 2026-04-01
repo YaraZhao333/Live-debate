@@ -222,22 +222,46 @@ module.exports = {
                 });
             }
             
-            // 先调用服务方法开始直播，确保 liveState 状态被正确更新
+            // 调用服务方法开始直播
             const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
+            console.log('📋 liveService.startLive 返回结果:', result);
             
-            // 同步更新 mockService.live 状态，保持与 liveState 一致
+            // 直接更新全局状态（双重保险）
+            const { updateGlobalLiveStatus, getGlobalLiveStatus } = require('../state/liveState');
+            const playHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+            
+            updateGlobalLiveStatus({
+                isLive: true,
+                streamUrl: playHls,
+                streamId: finalStreamId,
+                liveId: 'live-' + Date.now(),
+                startTime: new Date().toISOString()
+            });
+            
+            // 验证状态是否更新成功
+            const updatedStatus = getGlobalLiveStatus();
+            console.log('✅ 全局直播状态已更新:', updatedStatus);
+            
+            // 同步更新 mockService.live 状态
             mockService.live.status = "online";
             mockService.live.currentStream = finalStreamId;
             
-            // 返回前端可播放的 HLS 测试流
-            const playHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
-            
-            // 广播 live-started 事件给所有 WebSocket 客户端（关键修复）
+            // 广播 live-started 事件给所有 WebSocket 客户端
             broadcast('live-started', {
                 streamId: finalStreamId,
                 streamUrl: playHls,
                 timestamp: Date.now()
             });
+            
+            // 同时广播 live-status 事件（确保前端能收到）
+            broadcast('live-status', {
+                status: 'online',
+                isLive: true,
+                streamUrl: playHls,
+                streamId: finalStreamId
+            });
+            
+            console.log('📡 已广播 live-started 和 live-status 事件');
             
             return res.json({
                 code: 0,
@@ -252,7 +276,7 @@ module.exports = {
                 }
             });
         } catch (error) {
-            console.error('开始直播失败:', error);
+            console.error('❌ 开始直播失败:', error);
             return res.status(400).json({
                 code: -1,
                 message: error.message || '开始直播失败',
