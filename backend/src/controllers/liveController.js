@@ -1,23 +1,24 @@
 const liveService = require('../services/liveService');
+const mockService = require('../services/mockService');
 
 // 全局观看人数，用于波动
 let globalViewers = 123;
 
 // 直播相关控制器
 module.exports = {
-    // 获取直播状态
+    // 获取直播状态（前端轮询这个接口）
     getLiveStatus: (req, res) => {
         try {
             const streamId = req.query.stream_id || req.query.streamId;
-            const liveStatus = liveService.getLiveStatus();
             const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
             
             res.json({
                 code: 0,
-                message: 'ok',
+                message: 'success',
                 data: {
+                    status: mockService.live.status,
+                    current_stream: mockService.live.currentStream,
                     streamId: streamId,
-                    status: liveStatus.isLive ? 'running' : 'stopped',
                     aiStatus: aiStatus.status,
                     timestamp: Date.now()
                 }
@@ -202,7 +203,7 @@ module.exports = {
         }
     },
 
-    // 开始直播
+    // 开始直播（关键修复）
     startLive: (req, res) => {
         try {
             const { streamId, stream_id, autoStartAI = true, notifyUsers = true } = req.body;
@@ -217,6 +218,10 @@ module.exports = {
                 });
             }
             
+            // 设置直播状态为 online
+            mockService.live.status = "online";
+            mockService.live.currentStream = finalStreamId;
+            
             // 调用服务方法真正开始直播
             const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
             
@@ -228,12 +233,7 @@ module.exports = {
                 message: '直播已开始',
                 data: {
                     stream_id: finalStreamId,
-                    streamId: finalStreamId,
-                    play_hls: playHls,
-                    status: 'running',
-                    aiStatus: autoStartAI ? 'running' : 'stopped',
-                    notifyUsers,
-                    timestamp: Date.now()
+                    play_hls: playHls
                 }
             });
         } catch (error) {
@@ -261,18 +261,16 @@ module.exports = {
                 });
             }
             
+            // 设置直播状态为 offline
+            mockService.live.status = "offline";
+            mockService.live.currentStream = null;
+            
             // 调用服务方法真正停止直播
             const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
             
             return res.json({
                 code: 0,
-                message: '直播已停止',
-                data: {
-                    streamId: finalStreamId,
-                    status: 'stopped',
-                    aiStatus: 'stopped',
-                    timestamp: Date.now()
-                }
+                message: '直播已停止'
             });
         } catch (error) {
             console.error('停止直播失败:', error);

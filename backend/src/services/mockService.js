@@ -193,6 +193,11 @@ const mockData = {
 		debateId: null,
 		isScheduled: false,
 		updatedAt: new Date().toISOString()
+	},
+	
+	live: {
+		status: "offline",
+		currentStream: null
 	}
 };
 
@@ -658,6 +663,7 @@ module.exports = {
 	aiContent,
 	statistics,
 	liveSchedule,
+	live,
 	judges,
 	debateFlows,
 	debateFlowControls,
