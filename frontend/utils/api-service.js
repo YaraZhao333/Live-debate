@@ -809,10 +809,14 @@ class ApiService {
 
   /**
    * 获取当前直播状态
+   * @param {string|null} streamId - 可选，指定直播流ID
    * @returns {Promise<Object>} { isLive, streamUrl, ... }
    */
-   async getLiveStatus() {
-    const response = await this.request({ url: '/api/v1/admin/live/status', method: 'GET' });
+   async getLiveStatus(streamId = null) {
+    const url = streamId 
+      ? `/api/v1/admin/live/status?stream_id=${streamId}`
+      : '/api/v1/admin/live/status';
+    const response = await this.request({ url, method: 'GET' });
     // 如果返回的是包装格式 { success: true, data: {...} }，提取 data 字段
     if (response && response.success && response.data) {
       return response.data;

@@ -21,6 +21,10 @@ module.exports = {
         return { ...globalLiveStatus };
     },
     getStreamLiveStatuses: () => ({ ...streamLiveStatuses }),
+    getStreamLiveStatus: (streamId) => {
+        if (!streamId) return null;
+        return streamLiveStatuses[streamId] ? { ...streamLiveStatuses[streamId] } : null;
+    },
     updateStreamLiveStatus: (streamId, status) => {
         streamLiveStatuses[streamId] = { ...status };
         return { ...streamLiveStatuses };

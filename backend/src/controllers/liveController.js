@@ -14,14 +14,30 @@ module.exports = {
             const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
             const liveStatus = liveService.getLiveStatus();
             
+            // 🔧 关键修复：根据 streamId 获取对应流的直播状态
+            const { getStreamLiveStatus } = require('../state/liveState');
+            const streamLiveStatus = streamId ? getStreamLiveStatus(streamId) : null;
+            
+            // 如果该流有独立状态，使用流的状态；否则使用全局状态
+            const isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
+            const streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
+            const currentStreamId = streamLiveStatus ? streamId : liveStatus.streamId;
+            
+            console.log('📡 getLiveStatus 查询:', { 
+                streamId, 
+                isLive, 
+                streamLiveStatus: streamLiveStatus ? 'found' : 'not found',
+                globalIsLive: liveStatus.isLive 
+            });
+            
             res.json({
                 code: 0,
                 message: 'success',
                 data: {
-                    isLive: liveStatus.isLive,
-                    status: liveStatus.isLive ? 'online' : 'offline',
-                    streamUrl: liveStatus.streamUrl,
-                    current_stream: liveStatus.streamId,
+                    isLive: isLive,
+                    status: isLive ? 'online' : 'offline',
+                    streamUrl: streamUrl,
+                    current_stream: currentStreamId,
                     streamId: streamId,
                     aiStatus: aiStatus.status,
                     timestamp: Date.now()
@@ -408,13 +424,30 @@ module.exports = {
             globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
             if (globalViewers < 0) globalViewers = 0;
 
+            // 🔧 关键修复：根据 streamId 获取对应流的直播状态，而不是全局状态
+            // 这样每个流的 isLive 状态是独立的
+            const { getStreamLiveStatus } = require('../state/liveState');
+            const streamLiveStatus = streamId ? getStreamLiveStatus(streamId) : null;
+            
+            // 如果该流有独立状态，使用流的状态；否则使用全局状态
+            const isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
+            const streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
+            
+            console.log('📊 Dashboard 状态计算:', { 
+                streamId, 
+                isLive, 
+                streamLiveStatus: streamLiveStatus ? 'found' : 'not found',
+                globalIsLive: liveStatus.isLive 
+            });
+
             const dashboardData = {
                 streamId: streamId,
                 leftVotes: votes.leftVotes,
                 rightVotes: votes.rightVotes,
                 viewers: globalViewers,
-                status: liveStatus.isLive ? 'running' : 'stopped',
-                isLive: liveStatus.isLive,
+                status: isLive ? 'running' : 'stopped',
+                isLive: isLive,
+                streamUrl: streamUrl,
                 totalUsers: 100, // 模拟数据
                 totalVotes: votes.leftVotes + votes.rightVotes,
                 activeUsers: globalViewers,

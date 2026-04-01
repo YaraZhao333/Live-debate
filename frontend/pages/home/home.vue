@@ -1275,7 +1275,7 @@
 						}
 					} catch (dashboardError) {
 						// 如果 dashboard 接口失败，尝试使用 status 接口（兼容旧版本）
-						const statusResponse = await service.getLiveStatus();
+						const statusResponse = await service.getLiveStatus(this.streamId);
 						if (statusResponse) {
 							const streamUrl = statusResponse.streamUrl || statusResponse.activeStreamUrl;
 							if (streamUrl) {
@@ -3025,7 +3025,7 @@
 						}
 					} catch (dashboardError) {
 						// 兼容旧版本：如果 dashboard 接口不存在，尝试使用 status 接口
-						const statusResponse = await service.getLiveStatus();
+						const statusResponse = await service.getLiveStatus(this.streamId);
 						
 						
 						if (statusResponse && statusResponse.isLive) {
