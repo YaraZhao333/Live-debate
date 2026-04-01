@@ -663,10 +663,10 @@ module.exports = {
 	aiContent,
 	statistics,
 	liveSchedule,
-	live,
 	judges,
 	debateFlows,
 	debateFlowControls,
 	generateAIDebateContent,
-	generateVoteData
+	generateVoteData,
+	live: mockData.live
 };
