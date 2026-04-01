@@ -4,6 +4,19 @@ const http = require('http');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const httpProxy = require('http-proxy');
 
+// 全局错误处理（防止进程崩溃）
+process.on('uncaughtException', (err) => {
+    if (err.code === 'EPIPE' || err.code === 'ECONNRESET') {
+        console.log('⚠️ [全局] 忽略 EPIPE/ECONNRESET 错误');
+        return;
+    }
+    console.error('❌ [全局] 未捕获的异常:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ [全局] 未处理的 Promise 拒绝:', reason);
+});
+
 const app = express();
 const server = http.createServer(app);
 
@@ -153,6 +166,16 @@ wsProxy.on('error', (err, req, res) => {
 server.on('upgrade', (req, socket, head) => {
     if (req.url === '/ws') {
         console.log('🔄 [WS代理] 前端 /ws -> 后端 /ws');
+        
+        // 关键修复：在 socket 上添加错误处理，防止 EPIPE 导致崩溃
+        socket.on('error', (err) => {
+            if (err.code === 'EPIPE' || err.code === 'ECONNRESET') {
+                console.log('⚠️ [WS代理] Socket 连接被意外关闭，忽略错误');
+                return;
+            }
+            console.error('❌ [WS代理] Socket 错误:', err.message);
+        });
+        
         try {
             wsProxy.ws(req, socket, head);
         } catch (error) {
