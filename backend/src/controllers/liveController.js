@@ -233,7 +233,11 @@ module.exports = {
                 message: '直播已开始',
                 data: {
                     stream_id: finalStreamId,
-                    play_hls: playHls
+                    streamId: finalStreamId,
+                    play_hls: playHls,
+                    status: 'started',
+                    aiStatus: 'running',
+                    timestamp: Date.now()
                 }
             });
         } catch (error) {

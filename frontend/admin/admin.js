@@ -9,10 +9,10 @@ const SERVER_CONFIG = {
 	BACKEND_URL: 'http://192.140.160.119:8000',
 	// 当前使用的地址（修改这里切换服务器）
 	get BASE_URL() {
-		return 'https://live-debate-gateway.onrender.com';
+		return 'http://localhost:8081';
 	},
 	get WEB_SOCKET_URL() {
-		return 'https://live-debate-gateway.onrender.com';
+		return 'http://localhost:8081';
 	}
 };
 
@@ -20,7 +20,7 @@ const SERVER_CONFIG = {
 window.SERVER_CONFIG = SERVER_CONFIG;
 
 // API_BASE只保留基础URL，具体路径在各个API函数中定义
-const API_BASE = `${SERVER_CONFIG.BASE_URL}/api/admin`;
+const API_BASE = `${SERVER_CONFIG.BASE_URL}/api/v1/admin`;
 
 // 全局状态（如果admin-api.js已经创建了简单的版本，这里会覆盖它）
 const globalState = window.globalState || {

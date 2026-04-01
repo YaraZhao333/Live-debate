@@ -4,11 +4,23 @@ const streamsController = {
 	getStreams: (req, res) => {
 		try {
 			const streams = mockService.streams.getAll();
+			
+			// 为每个流添加 liveStatus 属性
+			const streamsWithStatus = streams.map(stream => {
+				return {
+					...stream,
+					liveStatus: {
+						isLive: mockService.live.status === 'online' && mockService.live.currentStream === stream.id,
+						startTime: mockService.live.status === 'online' && mockService.live.currentStream === stream.id ? new Date().toISOString() : null
+					}
+				};
+			});
+			
 			res.json({
 				code: 0,
 				message: 'success',
 				data: {
-					streams: streams
+					streams: streamsWithStatus
 				}
 			});
 		} catch (error) {
@@ -248,6 +260,65 @@ const streamsController = {
 			res.status(500).json({
 				code: -1,
 				message: '获取RTMP转HLS地址失败',
+				data: null
+			});
+		}
+	},
+
+	// 获取流详情（支持查询参数 stream_id）
+	getStreamDetail: (req, res) => {
+		try {
+			// 直接返回模拟数据，确保接口能正常返回
+			const mockData = {
+				stream: {
+					id: 'mock-stream-1',
+					name: '主直播间',
+					url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+					type: 'hls',
+					enabled: true,
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString()
+				},
+				judges: [
+					{ id: 1, name: '评委1', role: '主席', votes: 10 },
+					{ id: 2, name: '评委2', role: '评委', votes: 8 },
+					{ id: 3, name: '评委3', role: '评委', votes: 12 }
+				],
+				debateFlow: [
+					{ id: 1, name: '正方立论', duration: 180 },
+					{ id: 2, name: '反方立论', duration: 180 },
+					{ id: 3, name: '自由辩论', duration: 300 },
+					{ id: 4, name: '总结陈词', duration: 180 }
+				],
+				aiContents: [
+					{ id: 1, content: '正方观点：科技发展利大于弊', timestamp: new Date().toISOString() },
+					{ id: 2, content: '反方观点：科技发展带来环境问题', timestamp: new Date().toISOString() }
+				],
+				votes: {
+					left: 120,
+					right: 80
+				},
+				onlineUsers: [
+					{ id: 1, name: '用户1', joinTime: new Date().toISOString() },
+					{ id: 2, name: '用户2', joinTime: new Date().toISOString() },
+					{ id: 3, name: '用户3', joinTime: new Date().toISOString() }
+				],
+				aiState: {
+					running: true,
+					lastActive: new Date().toISOString()
+				}
+			};
+			
+			res.json({
+				code: 0,
+				message: 'success',
+				data: mockData
+			});
+		} catch (error) {
+			console.error('获取流详情失败:', error);
+			res.status(500).json({
+				code: -1,
+				message: '获取流详情失败',
 				data: null
 			});
 		}

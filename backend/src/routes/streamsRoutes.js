@@ -4,6 +4,11 @@ const streamsController = require('../controllers/streamsController');
 
 // 直播流管理API路由
 router.get('/streams', streamsController.getStreams);
+
+// 流详情接口
+router.get('/streams/detail', streamsController.getStreamDetail);
+
+// 其他直播流管理API路由
 router.get('/streams/:id', streamsController.getStreamById);
 router.post('/streams', streamsController.createStream);
 router.put('/streams/:id', streamsController.updateStream);
