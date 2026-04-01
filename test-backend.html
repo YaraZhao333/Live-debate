@@ -53,7 +53,8 @@
         <button onclick="testGetStatus()">2️⃣ 获取直播状态</button>
         <button onclick="testStartLive()">3️⃣ 开始直播</button>
         <button onclick="testStopLive()">4️⃣ 停止直播</button>
-        <button onclick="testGetViewers()">5️⃣ 获取观看人数</button>
+        <button onclick="testGetViewers()">5️⃣ 获取单流观看人数</button>
+        <button onclick="testGetAllViewers()">5️⃣+ 获取所有流观看人数</button>
         <button onclick="testGetVotes()">6️⃣ 获取投票</button>
         <button onclick="testGetDashboard()">7️⃣ 获取Dashboard</button>
         <pre id="liveResult"></pre>
@@ -120,6 +121,16 @@
         async function testGetViewers() {
             try {
                 const res = await fetch(backendUrl() + '/api/v1/admin/live/viewers?stream_id=' + streamId());
+                const data = await res.json();
+                logResult('liveResult', JSON.stringify(data, null, 2));
+            } catch (e) {
+                logResult('liveResult', '❌ 错误: ' + e.message, true);
+            }
+        }
+        
+        async function testGetAllViewers() {
+            try {
+                const res = await fetch(backendUrl() + '/api/v1/admin/live/viewers');
                 const data = await res.json();
                 logResult('liveResult', JSON.stringify(data, null, 2));
             } catch (e) {

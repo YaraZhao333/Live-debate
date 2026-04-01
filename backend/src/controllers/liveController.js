@@ -157,7 +157,7 @@ module.exports = {
         }
     },
 
-    // 获取观看人数
+    // 获取观看人数（支持两种模式）
     getViewersCount: (req, res) => {
         try {
             const streamId = req.query.stream_id || req.query.streamId;
@@ -166,6 +166,23 @@ module.exports = {
             globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
             if (globalViewers < 0) globalViewers = 0;
             
+            // 如果没有 stream_id，返回所有流的数据（多直播总览用）
+            if (!streamId) {
+                res.json({
+                    code: 0,
+                    message: 'ok',
+                    data: {
+                        streams: {
+                            'mock-stream-1': Math.floor(Math.random() * 200),
+                            'mock-stream-2': Math.floor(Math.random() * 200)
+                        },
+                        timestamp: Date.now()
+                    }
+                });
+                return;
+            }
+            
+            // 有 stream_id，返回单个流的数据
             res.json({
                 code: 0,
                 message: 'ok',
