@@ -133,8 +133,9 @@ app.use('/live', createProxyMiddleware({
 // =========================
 // WebSocket 真实代理（符合测试题要求）
 // =========================
+// 使用 HTTP 后端地址，让网关处理 WebSocket 升级
 const wsProxy = httpProxy.createProxyServer({
-    target: BACKEND_URL.replace(/^http/, 'ws'),
+    target: BACKEND_URL,
     changeOrigin: true,
     ws: true
 });
