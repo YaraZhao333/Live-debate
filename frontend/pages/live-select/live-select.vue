@@ -280,6 +280,16 @@ export default {
 						status: 'started',
 						activeUsers: data.activeUsers || 0
 					});
+				} else if (data) {
+					// 如果没有 streamId，尝试更新所有流的状态
+					console.log('📡 没有 streamId，尝试更新所有流');
+					this.liveStreams.forEach(stream => {
+						this.updateLiveStatus(stream.id, {
+							isLive: true,
+							status: 'started',
+							activeUsers: data.activeUsers || 0
+						});
+					});
 				}
 				return;
 			}
@@ -293,6 +303,17 @@ export default {
 						status: data.status,
 						activeUsers: data.activeUsers || 0
 					});
+				} else if (data) {
+					// 如果没有 streamId，尝试更新所有流的状态
+					console.log('📡 没有 streamId，尝试更新所有流');
+					const isLive = data.isLive || data.status === 'online';
+					this.liveStreams.forEach(stream => {
+						this.updateLiveStatus(stream.id, {
+							isLive: isLive,
+							status: data.status,
+							activeUsers: data.activeUsers || 0
+						});
+					});
 				}
 				return;
 			}
@@ -302,6 +323,16 @@ export default {
 				console.log('📡 收到直播状态变更:', data);
 				if (currentStreamId && data) {
 					this.updateLiveStatus(currentStreamId, data);
+				} else if (data) {
+					// 如果没有 streamId，尝试更新所有流的状态
+					console.log('📡 没有 streamId，尝试更新所有流');
+					const isLive = data.isLive !== undefined ? data.isLive : (data.status === 'started' || data.status === 'running');
+					this.liveStreams.forEach(stream => {
+						this.updateLiveStatus(stream.id, {
+							...data,
+							isLive: isLive
+						});
+					});
 				}
 				return;
 			}
