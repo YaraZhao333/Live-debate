@@ -290,12 +290,16 @@ export default {
 		},
 		
 		updateLiveStatus(streamId, data) {
+			console.log('🔄 更新直播状态:', { streamId, data, availableStreams: this.liveStreams.map(s => s.id) });
 			const stream = this.liveStreams.find(s => s.id === streamId);
 			if (stream) {
 				const isLive = data.isLive !== undefined ? data.isLive : (data.status === 'started' || data.status === 'running');
+				console.log('✅ 找到流，更新 isLive:', isLive);
 				stream.isLive = isLive;
 				if (data.activeUsers !== undefined) stream.activeUsers = data.activeUsers;
 				this.$forceUpdate();
+			} else {
+				console.warn('⚠️ 未找到对应的流:', streamId);
 			}
 		}
 	}
