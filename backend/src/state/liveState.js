@@ -1,13 +1,14 @@
 // 直播状态管理
+// 临时设置为 LIVE 以便测试前端功能
 let globalLiveStatus = {
-    isLive: false,
-    streamUrl: null,
+    isLive: true,
+    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
     scheduledStartTime: null,
     scheduledEndTime: null,
-    streamId: null,
+    streamId: 'mock-stream-1',
     isScheduled: false,
-    liveId: null,
-    startTime: null
+    liveId: 'live-test-001',
+    startTime: new Date().toISOString()
 };
 
 // 每个流的独立直播状态
