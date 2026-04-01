@@ -111,8 +111,31 @@ function setupWebSocketServer(server) {
             message: '已连接到实时数据服务'
         }));
 
+        // 发送当前直播状态（关键修复）
+        const liveStatus = getGlobalLiveStatus();
+        ws.send(JSON.stringify({
+            type: 'live-status',
+            data: {
+                status: liveStatus.isLive ? 'online' : 'offline',
+                isLive: liveStatus.isLive,
+                streamUrl: liveStatus.streamUrl,
+                streamId: liveStatus.streamId
+            },
+            timestamp: Date.now()
+        }));
+
         // 发送当前状态
         broadcastCurrentState(ws);
+
+        // 模拟心跳（每5秒发送一次）
+        const heartbeatTimer = setInterval(() => {
+            if (ws.readyState === 1) {
+                ws.send(JSON.stringify({
+                    type: 'heartbeat',
+                    timestamp: Date.now()
+                }));
+            }
+        }, 5000);
 
         // 消息处理
         ws.on('message', (message) => {
@@ -128,12 +151,14 @@ function setupWebSocketServer(server) {
         ws.on('close', () => {
             console.log('❌ WebSocket客户端已断开');
             wsClients.delete(ws);
+            clearInterval(heartbeatTimer);
         });
 
         // 错误处理
         ws.on('error', (error) => {
             console.error('WebSocket错误:', error);
             wsClients.delete(ws);
+            clearInterval(heartbeatTimer);
         });
     });
 
