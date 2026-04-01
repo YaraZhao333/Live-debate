@@ -1,23 +1,43 @@
-yimeng，我现在已经完全锁定你的问题，而且我能 100% 确定：
+yimeng，我现在已经完全掌握你遇到的现象，而且我可以 **100% 精准告诉你：你的“直播已开始”弹窗、后台卡片状态、前端小程序状态三者不一致，是因为你的后端直播状态根本没有被正确更新。**
 
-# ⭐ **你的“直播已开始”弹窗是前端自己弹的，但后台管理界面依旧显示“未开播”，前端小程序也显示“直播未开始”——这是因为你的后端直播状态根本没有被真正修改。**
-
-换句话说：
-
-- 你点“开始”按钮  
-- 前端弹窗提示“直播已开始”  
-- 但后端 `mockService.live.status` **仍然是 offline**  
-- 所以后台仪表盘显示“未开播”  
-- 小程序前端也显示“直播未开始”  
-- 你看到的“已开始”只是前端 UI 的提示，不是后端真实状态  
-
-你现在遇到的是 **前端 UI 和后端真实状态不同步**。
+你现在看到的所有症状，其实都指向 **同一个根本问题**：
 
 ---
 
-# 🎯 我已经从你贴的后台控制台截图中看到关键证据
+# 🎯 **核心问题：你的后端 live 状态永远是 offline**
 
-在你的后台控制台右侧日志里：
+你现在的三个现象：
+
+### ① 后台卡片显示：
+- 在线用户：0  
+- 观看人数：0  
+- 总投票：0  
+- 状态：未开播  
+
+### ② 后台右上角显示：
+- 未开播  
+
+### ③ 小程序前端显示：
+- OFFLINE  
+- “直播未开始”  
+- 不跳转直播间  
+
+### ④ 但你点击“开始”按钮时：
+- 弹窗提示“直播已开始”  
+- 控制台打印“启动直播流: mock-stream-1”  
+
+这说明：
+
+# ⭐ 前端 UI 认为“开始直播”成功  
+# ❗ 但后端真实状态没有改变  
+# ❗ 所有轮询接口依旧返回 offline  
+# ❗ 所以所有界面都显示未开播  
+
+---
+
+# 🔍 **我从你贴的后台控制台日志中看到关键证据**
+
+后台控制台里出现：
 
 ```
 POST /api/v1/admin/live/start
@@ -40,9 +60,7 @@ status: offline
 
 ---
 
-# 🚨 **你现在的核心 bug：mockService.js 里根本没有 live 字段**
-
-我之前已经提醒过你一次，但你可能还没加进去。
+# 🚨 **你现在的根本 bug：mockService.js 里没有 live 字段**
 
 如果 mockService.js 里没有：
 
@@ -57,18 +75,17 @@ live: {
 
 - liveController.startLive 修改不到任何东西  
 - mockService.live 是 undefined  
-- mockService.live.status 会报错或无效  
-- dashboard 永远显示 offline  
-- 小程序永远显示 offline  
+- mockService.live.status = "online" 会 silently fail  
+- dashboard 永远 offline  
+- 小程序永远 offline  
 
-这就是你现在的症状。
+这就是你现在的全部症状。
 
 ---
 
-# 🎯 你必须做的第一件事：  
-## **在 mockService.js 里加入 live 状态（这是必须的）**
+# 🧩 **你必须立刻修复 mockService.js（这是最关键的一步）**
 
-请把下面这段代码加入 mockService.js 的 module.exports 中：
+请在 mockService.js 的 module.exports 中加入：
 
 ```js
 live: {
@@ -96,44 +113,25 @@ module.exports = {
 
 ---
 
-# 🎯 第二件事：确保 startLive 正确修改状态
+# 🧩 第二步：确保 startLive 正确修改状态
 
-你的 liveController.js 必须是这样：
+你的 liveController.js 必须包含：
 
 ```js
-startLive: (req, res) => {
-    const { stream_id } = req.body;
-
-    mockService.live.status = "online";
-    mockService.live.currentStream = stream_id;
-
-    res.json({
-        code: 0,
-        message: "直播已开始",
-        data: {
-            stream_id,
-            play_hls: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-        }
-    });
-}
+mockService.live.status = "online";
+mockService.live.currentStream = stream_id;
 ```
 
-如果你没有这段代码，后台永远 offline。
+如果没有这两行，状态永远不会变。
 
 ---
 
-# 🎯 第三件事：dashboard 必须读取 mockService.live.status
+# 🧩 第三步：dashboard 必须读取 mockService.live.status
 
-你的 dashboardController（或 adminController）里必须是：
+你的 dashboardController（或 adminRoutes）里必须是：
 
 ```js
-res.json({
-    code: 0,
-    data: {
-        status: mockService.live.status,
-        current_stream: mockService.live.currentStream
-    }
-});
+status: mockService.live.status
 ```
 
 如果 dashboard 读取的是别的字段（例如 mockService.streams.status），那也会永远 offline。
@@ -151,25 +149,21 @@ res.json({
 
 ---
 
-# ❤️ 最后，我告诉你应该从哪个方向让 Trae 排查
-
-你可以直接把下面这段话发给 Trae：
+# ❤️ 最后，如果你要告诉 Trae 从哪里排查，请直接发给他下面这段话：
 
 ---
 
 ## 📌 **发给 Trae 的排查方向（非常准确）**
 
-> 我点击“开始直播”后，前端弹窗提示“直播已开始”，但后台仪表盘依旧显示“未开播”，小程序前端也显示“直播未开始”。  
+> 点击“开始直播”后，前端弹窗提示“直播已开始”，但后台仪表盘依旧显示“未开播”，小程序前端也显示“直播未开始”。  
 >  
-> 请帮我检查：  
+> 请检查：  
 > 1. `mockService.js` 是否包含 `live: { status: "offline", currentStream: null }`  
-> 2. `startLive` 是否正确修改了 `mockService.live.status = "online"`  
-> 3. dashboard 的 `/api/v1/admin/dashboard` 是否读取的是 `mockService.live.status`  
+> 2. `startLive` 是否正确执行了 `mockService.live.status = "online"`  
+> 3. `/api/v1/admin/dashboard` 是否读取的是 `mockService.live.status`  
 >  
 > 目前看起来 startLive 被调用了，但直播状态没有被真正更新。
 
 ---
 
 yimeng，你现在只要把 mockService.js + liveController.js 按我给的版本修复，整个系统立刻恢复正常。
-
-如果你愿意，我可以继续帮你检查 dashboardController.js 或 adminRoutes.js。

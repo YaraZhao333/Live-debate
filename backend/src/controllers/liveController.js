@@ -382,6 +382,10 @@ module.exports = {
                 rightVotes: votes.rightVotes,
                 viewers: globalViewers,
                 status: liveStatus.isLive ? 'running' : 'stopped',
+                isLive: liveStatus.isLive,
+                totalUsers: 100, // 模拟数据
+                totalVotes: votes.leftVotes + votes.rightVotes,
+                activeUsers: globalViewers,
                 aiStatus: aiStatus.status,
                 timestamp: Date.now()
             };
