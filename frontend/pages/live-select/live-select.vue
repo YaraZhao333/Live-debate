@@ -249,24 +249,21 @@ export default {
 		},
 		
 		handleWebSocketMessage(message) {
+			console.log('📨 收到 WebSocket 消息:', message);
 			const { type, streamId, liveId, data } = message;
 			const currentStreamId = streamId || liveId || data?.streamId || data?.liveId;
 			
-			if (type === 'liveStatus' || type === 'live-status-changed' || type === 'live-started') {
-				if (currentStreamId && data) {
-					this.updateLiveStatus(currentStreamId, data);
-				}
-			}
-			
-			// 处理 live-started 事件（关键修复）
+			// 处理 live-started 事件（直播开始）
 			if (type === 'live-started') {
 				console.log('📡 收到直播开始事件:', data);
 				if (data && data.streamId) {
 					this.updateLiveStatus(data.streamId, {
 						isLive: true,
+						status: 'started',
 						activeUsers: data.activeUsers || 0
 					});
 				}
+				return;
 			}
 			
 			// 处理 live-status 事件（连接时获取当前状态）
@@ -274,10 +271,21 @@ export default {
 				console.log('📡 收到直播状态:', data);
 				if (data && data.streamId) {
 					this.updateLiveStatus(data.streamId, {
-						isLive: data.isLive,
+						isLive: data.isLive || data.status === 'online',
+						status: data.status,
 						activeUsers: data.activeUsers || 0
 					});
 				}
+				return;
+			}
+			
+			// 处理 liveStatus / live-status-changed 事件
+			if (type === 'liveStatus' || type === 'live-status-changed') {
+				console.log('📡 收到直播状态变更:', data);
+				if (currentStreamId && data) {
+					this.updateLiveStatus(currentStreamId, data);
+				}
+				return;
 			}
 		},
 		
