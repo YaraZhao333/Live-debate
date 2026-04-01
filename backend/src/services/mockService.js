@@ -105,35 +105,26 @@ const mockData = {
 				name: '王律师',
 				role: '嘉宾评委',
 				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge3',
-				votes: 2
+				votes: 4
 			}
 		],
 		'mock-stream-2': [
 			{
-				id: 'judge-1',
-				name: '陈老师',
+				id: 'judge-4',
+				name: '陈教授',
 				role: '主评委',
 				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge4',
 				votes: 0
 			},
 			{
-				id: 'judge-2',
-				name: '刘专家',
+				id: 'judge-5',
+				name: '林博士',
 				role: '嘉宾评委',
 				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge5',
-				votes: 0
-			},
-			{
-				id: 'judge-3',
-				name: '赵顾问',
-				role: '嘉宾评委',
-				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge6',
 				votes: 0
 			}
 		]
 	},
-	
-	debateFlowStates: {},
 
 	debateFlows: {
 		'mock-stream-1': [
@@ -142,66 +133,91 @@ const mockData = {
 			{ id: 'seg-3', name: '总结陈词', duration: 120 }
 		],
 		'mock-stream-2': [
-			{ id: 'seg-1', name: '开篇立论', duration: 240 },
-			{ id: 'seg-2', name: '攻辩环节', duration: 180 },
-			{ id: 'seg-3', name: '自由辩论', duration: 240 },
-			{ id: 'seg-4', name: '总结陈词', duration: 180 }
+			{ id: 'seg-1', name: '开场陈述', duration: 180 },
+			{ id: 'seg-2', name: '自由辩论', duration: 300 },
+			{ id: 'seg-3', name: '总结陈词', duration: 120 }
 		]
 	},
-	
-	votes: {
-		leftVotes: 45,
-		rightVotes: 55,
-		total: 100,
-		updatedAt: new Date().toISOString()
-	},
-	
-	userVotes: [],
-	
+
 	aiContent: [
 		{
-			id: uuidv4(),
-			position: 'left',
-			content: '关于"如果有一个能一键消除痛苦的按钮，你会按吗？"，我认为会按这个按钮。痛苦是阻碍人类进步的主要障碍之一。',
-			timestamp: Date.now() - 60000,
-			likes: 12,
-			comments: []
+			id: 'ai-content-1',
+			title: '辩论技巧分享',
+			content: '在辩论中，逻辑清晰是最重要的。',
+			timestamp: Date.now(),
+			likes: 15,
+			comments: [
+				{
+					id: 'comment-1',
+					content: '说得很有道理！',
+					createdAt: new Date().toISOString(),
+					likes: 3
+				}
+			]
 		},
 		{
-			id: uuidv4(),
-			position: 'right',
-			content: '关于"如果有一个能一键消除痛苦的按钮，你会按吗？"，我认为不会按这个按钮。痛苦是成长的重要组成部分。',
-			timestamp: Date.now() - 30000,
+			id: 'ai-content-2',
+			title: '如何准备辩论',
+			content: '充分的准备是成功的关键。',
+			timestamp: Date.now() - 3600000,
 			likes: 8,
 			comments: []
 		}
 	],
-	
+
+	votes: {
+		leftVotes: 50,
+		rightVotes: 50,
+		total: 100,
+		updatedAt: new Date().toISOString()
+	},
+
+	userVotes: [
+		{
+			id: 'user-vote-1',
+			userId: 'mock-user-1',
+			position: 'left',
+			createdAt: new Date().toISOString()
+		},
+		{
+			id: 'user-vote-2',
+			userId: 'mock-user-2',
+			position: 'right',
+			createdAt: new Date().toISOString()
+		}
+	],
+
 	statistics: {
-		totalVotes: 8,
-		totalUsers: 2,
-		totalComments: 15,
+		totalVotes: 100,
+		totalUsers: 5,
+		totalComments: 1,
 		totalLikes: 23,
-		dailyStats: [],
+		lastLiveTime: new Date().toISOString(),
+		liveDuration: 3600,
 		updatedAt: new Date().toISOString()
 	},
-	
+
+	debateFlowStates: {
+		'mock-stream-1': {
+			currentSegmentIndex: 0,
+			remainingTime: 180,
+			isRunning: false,
+			isPaused: false,
+			startTime: null,
+			pauseTime: null,
+			segmentName: '开场陈述'
+		}
+	},
+
 	liveSchedule: {
-		scheduledStartTime: null,
-		scheduledEndTime: null,
-		streamId: null,
-		debateId: null,
-		isScheduled: false,
+		nextLiveTime: new Date(Date.now() + 86400000).toISOString(),
+		topic: '人工智能的未来',
+		speakers: ['专家A', '专家B'],
 		updatedAt: new Date().toISOString()
-	},
-	
-	live: {
-		status: "offline",
-		currentStream: null
 	}
 };
 
-// 直播流管理
+// 流管理
 const streams = {
 	getAll: () => mockData.streams,
 	
@@ -309,16 +325,6 @@ const users = {
 			};
 			return mockData.users[index];
 		}
-	},
-	
-	updateStats: (id, stats) => {
-		const index = mockData.users.findIndex(u => u.id === id);
-		if (index === -1) return null;
-		
-		mockData.users[index].totalVotes = (mockData.users[index].totalVotes || 0) + (stats.votes || 0);
-		mockData.users[index].joinedDebates = (mockData.users[index].joinedDebates || 0) + (stats.debates || 0);
-		mockData.users[index].updatedAt = new Date().toISOString();
-		return mockData.users[index];
 	}
 };
 
@@ -407,7 +413,7 @@ const userVotes = {
 	}
 };
 
-// AI内容管理
+// AI 内容管理
 const aiContent = {
 	getAll: () => mockData.aiContent,
 	
@@ -484,18 +490,6 @@ const liveSchedule = {
 			updatedAt: new Date().toISOString()
 		};
 		return mockData.liveSchedule;
-	},
-	
-	clear: () => {
-		mockData.liveSchedule = {
-			scheduledStartTime: null,
-			scheduledEndTime: null,
-			streamId: null,
-			debateId: null,
-			isScheduled: false,
-			updatedAt: new Date().toISOString()
-		};
-		return mockData.liveSchedule;
 	}
 };
 
@@ -562,111 +556,41 @@ const debateFlowControls = {
 				state.pauseTime = null;
 				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
 				break;
-
 			case 'pause':
-				if (state.isRunning) {
-					state.isPaused = true;
-					state.pauseTime = Date.now();
-				}
+				state.isRunning = false;
+				state.isPaused = true;
+				state.pauseTime = Date.now();
 				break;
-
 			case 'resume':
-				if (state.isPaused) {
-					state.isPaused = false;
-					state.startTime = Date.now() - (state.pauseTime - (state.startTime || 0));
-					state.pauseTime = null;
-				}
+				state.isRunning = true;
+				state.isPaused = false;
+				state.startTime = Date.now() - (state.pauseTime - state.startTime);
+				state.pauseTime = null;
 				break;
-
-			case 'reset':
-				state.currentSegmentIndex = 0;
-				state.remainingTime = segments[0]?.duration || 180;
+			case 'stop':
 				state.isRunning = false;
 				state.isPaused = false;
+				state.remainingTime = 0;
 				state.startTime = null;
 				state.pauseTime = null;
-				state.segmentName = segments[0]?.name || '';
-				break;
-
-			case 'next':
-				state.currentSegmentIndex = Math.min(state.currentSegmentIndex + 1, segments.length - 1);
-				state.remainingTime = segments[state.currentSegmentIndex]?.duration || 180;
-				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
-				state.startTime = Date.now();
-				break;
-
-			case 'prev':
-				state.currentSegmentIndex = Math.max(state.currentSegmentIndex - 1, 0);
-				state.remainingTime = segments[state.currentSegmentIndex]?.duration || 180;
-				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
-				state.startTime = Date.now();
 				break;
 		}
 
-		return {
-			...state,
-			action,
-			segmentIndex: state.currentSegmentIndex,
-			timestamp: new Date().toISOString()
-		};
+		return state;
 	}
 };
 
-// 生成动态AI辩论内容
-function generateAIDebateContent(topic, position) {
-	const args = {
-		left: [
-			`关于"${topic}"，我认为会按这个按钮。痛苦是阻碍人类进步的主要障碍之一。`,
-			`消除痛苦可以让人们更专注于创造和建设，而不是被负面情绪所困扰。`,
-			`历史上很多伟大的成就都是在摆脱痛苦之后才实现的。`,
-			`痛苦往往会导致非理性的决策，消除痛苦能让我们更清醒地思考。`
-		],
-		right: [
-			`关于"${topic}"，我认为不会按这个按钮。痛苦是成长的重要组成部分。`,
-			`没有痛苦的经历，我们无法真正理解和珍惜幸福。`,
-			`痛苦能够激发人类的潜能，推动我们不断进步。`,
-			`完全消除痛苦可能导致人类失去同理心和情感深度。`
-		]
-	};
-	
-	const selectedArgs = arguments[position] || arguments.left;
-	const randomArg = selectedArgs[Math.floor(Math.random() * selectedArgs.length)];
-	
-	return {
-		position,
-		content: randomArg,
-		timestamp: Date.now()
-	};
-}
-
-// 生成投票数据
-function generateVoteData() {
-	const leftVotes = Math.floor(Math.random() * 100) + 50;
-	const rightVotes = Math.floor(Math.random() * 100) + 50;
-	const total = leftVotes + rightVotes;
-	
-	return {
-		leftVotes,
-		rightVotes,
-		total,
-		leftPercentage: ((leftVotes / total) * 100).toFixed(1),
-		rightPercentage: ((rightVotes / total) * 100).toFixed(1)
-	};
-}
-
+// 导出所有服务
 module.exports = {
 	streams,
 	debate,
 	users,
+	statistics,
 	votes,
 	userVotes,
 	aiContent,
-	statistics,
 	liveSchedule,
 	judges,
 	debateFlows,
-	debateFlowControls,
-	generateAIDebateContent,
-	generateVoteData,
-	live: mockData.live
+	debateFlowControls
 };

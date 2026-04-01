@@ -25,10 +25,10 @@ module.exports = {
 
             const judges = mockService.judges.getByStreamId(stream_id);
             const debateFlow = mockService.debateFlows.getByStreamId(stream_id);
-            const aiContents = mockService.aiContent.getRecent(10, stream_id);
-            const votes = mockService.votes.get(stream_id);
+            const aiContents = mockService.aiContent.getAll().slice(0, 10);
+            const votes = mockService.votes.get();
             const users = mockService.users.getAll();
-            const aiState = mockService.aiContent.getAIState(stream_id);
+            const aiState = mockService.aiContent.getAll()[0] || {};
 
             res.json({
                 code: 0,
