@@ -89,7 +89,9 @@ export default {
 			wsConnection: null,
 			reconnectTimer: null,
 			lastRefreshTime: 0,
-			minRefreshInterval: 10000
+			minRefreshInterval: 10000,
+			serverRestartDetected: false,
+			lastKnownLiveStatus: null
 		};
 	},
 	
@@ -97,6 +99,9 @@ export default {
 		console.log('📺 直播选择页面加载');
 		this.loadLiveStreams();
 		this.connectWebSocket();
+		
+		// 启动服务重启检测定时器
+		this.startServerRestartDetection();
 	},
 	
 	onShow() {
@@ -110,6 +115,7 @@ export default {
 	
 	onUnload() {
 		this.disconnectWebSocket();
+		this.stopServerRestartDetection();
 	},
 	
 	methods: {
@@ -152,6 +158,12 @@ export default {
 			try {
 				const dashboard = await apiService.getDashboard(stream.id);
 				const isCurrentlyLive = dashboard?.isLive === true;
+				
+				// 记录初始直播状态（用于服务重启检测）
+				if (this.lastKnownLiveStatus === null) {
+					this.lastKnownLiveStatus = isCurrentlyLive;
+					console.log('📝 记录初始直播状态:', isCurrentlyLive);
+				}
 				
 				// 从 dashboard 获取辩题信息（包含 leftSide 和 rightSide）
 				let debateTopic = null;
@@ -345,6 +357,62 @@ export default {
 				stream.isLive = isLive;
 				if (data.activeUsers !== undefined) stream.activeUsers = data.activeUsers;
 				this.$forceUpdate();
+			}
+		},
+		
+		// 启动服务重启检测定时器
+		startServerRestartDetection() {
+			// 每30秒检测一次服务是否重启
+			this.serverRestartCheckTimer = setInterval(() => {
+				this.checkServerRestart();
+			}, 30000);
+		},
+		
+		// 停止服务重启检测定时器
+		stopServerRestartDetection() {
+			if (this.serverRestartCheckTimer) {
+				clearInterval(this.serverRestartCheckTimer);
+				this.serverRestartCheckTimer = null;
+			}
+		},
+		
+		// 检测服务是否重启
+		async checkServerRestart() {
+			try {
+				// 获取当前直播状态
+				const dashboard = await apiService.getDashboard();
+				const currentIsLive = dashboard?.isLive === true;
+				
+				// 如果之前有直播状态记录，但现在状态不一致，可能是服务重启了
+				if (this.lastKnownLiveStatus !== null && this.lastKnownLiveStatus !== currentIsLive) {
+					console.log('⚠️ 检测到服务状态变化:', {
+						lastKnown: this.lastKnownLiveStatus,
+						current: currentIsLive
+					});
+					
+					// 如果之前是直播中，现在变成未直播，可能是服务重启了
+					if (this.lastKnownLiveStatus === true && currentIsLive === false) {
+						console.log('🔄 服务可能已重启，直播状态已重置');
+						this.serverRestartDetected = true;
+						
+						// 显示提示
+						uni.showModal({
+							title: '服务已重启',
+							content: '检测到服务器已重启，直播状态已重置。请返回后台管理重新开启直播。',
+							showCancel: false,
+							confirmText: '我知道了',
+							success: () => {
+								// 刷新列表
+								this.refreshStreams();
+							}
+						});
+					}
+				}
+				
+				// 更新已知状态
+				this.lastKnownLiveStatus = currentIsLive;
+			} catch (error) {
+				console.error('❌ 检测服务重启失败:', error);
 			}
 		}
 	}
