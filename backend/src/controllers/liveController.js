@@ -1,373 +1,197 @@
-const liveService = require('../services/liveService');
+// ===============================
+// 全局状态（你可以换成数据库）
+// ===============================
+let liveStatus = "stopped"; // running | stopped
+let aiStatus = "stopped";
+let currentStreamId = null;
+let viewersCount = 0;
+let voteData = { left: 0, right: 0 };
+let liveSchedule = null;
 
-// 全局观看人数，用于波动
-let globalViewers = 123;
+// ===============================
+// 工具函数：统一成功响应
+// ===============================
+function ok(message, data = {}) {
+  return { code: 0, message, data };
+}
 
-// 直播相关控制器
+// 工具函数：统一失败响应
+function fail(message) {
+  return { code: -1, message, data: null };
+}
+
+// ===============================
+// 控制器开始
+// ===============================
 module.exports = {
-    // 获取直播状态
-    getLiveStatus: (req, res) => {
-        try {
-            const streamId = req.query.stream_id || req.query.streamId;
-            const liveStatus = liveService.getLiveStatus();
-            const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
-            
-            res.json({
-                code: 0,
-                message: 'ok',
-                data: {
-                    streamId: streamId,
-                    status: liveStatus.isLive ? 'running' : 'stopped',
-                    aiStatus: aiStatus.status,
-                    timestamp: Date.now()
-                }
-            });
-        } catch (error) {
-            console.error('获取直播状态失败:', error);
-            res.status(500).json({
-                code: -1,
-                message: '获取失败',
-                data: null
-            });
-        }
-    },
 
-    // 管理员控制直播
-    adminControlLive: (req, res) => {
-        try {
-            const { action, streamUrl } = req.body;
-            const result = liveService.controlLive(action, streamUrl);
+  // ===============================
+  // 1. 获取后台 Dashboard 信息
+  // ===============================
+  getDashboard: (req, res) => {
+    res.json(ok("ok", {
+      liveStatus,
+      aiStatus,
+      currentStreamId,
+      viewersCount,
+      voteData,
+      timestamp: Date.now()
+    }));
+  },
 
-            res.json({
-                code: 0,
-                message: '操作成功',
-                data: {
-                    status: result.isLive ? 'started' : 'stopped',
-                    streamUrl: result.streamUrl
-                }
-            });
-        } catch (error) {
-            console.error('控制直播状态失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: '操作失败',
-                data: null
-            });
-        }
-    },
+  // ===============================
+  // 2. 开始直播
+  // ===============================
+  startLive: (req, res) => {
+    try {
+      const { streamId, autoStartAI } = req.body;
 
-    // 用户控制直播
-    userControlLive: (req, res) => {
-        try {
-            const { action, streamId } = req.body;
-            const result = liveService.controlLive(action, null, streamId);
+      if (!streamId) {
+        return res.json(fail("缺少 streamId"));
+      }
 
-            res.json({
-                code: 0,
-                message: result.isLive ? '直播已开始' : '直播已停止',
-                data: {
-                    status: result.isLive ? 'started' : 'stopped',
-                    streamUrl: result.streamUrl,
-                    streamId: result.streamId
-                }
-            });
-        } catch (error) {
-            console.error('用户控制直播状态失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: '操作失败: ' + error.message,
-                data: null
-            });
-        }
-    },
+      console.log("🚀 开始直播:", streamId);
 
-    // 设置直播计划
-    setLiveSchedule: (req, res) => {
-        try {
-            const schedule = liveService.setLiveSchedule(req.body);
-            res.json({
-                code: 0,
-                message: '直播计划已设置',
-                data: schedule
-            });
-        } catch (error) {
-            console.error('设置直播计划失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: '设置失败',
-                data: null
-            });
-        }
-    },
+      currentStreamId = streamId;
+      liveStatus = "running";
+      aiStatus = autoStartAI ? "running" : "stopped";
 
-    // 获取直播计划
-    getLiveSchedule: (req, res) => {
-        try {
-            const schedule = liveService.getLiveSchedule();
-            res.json({
-                code: 0,
-                message: 'success',
-                data: schedule
-            });
-        } catch (error) {
-            res.status(500).json({
-                code: -1,
-                message: '获取失败',
-                data: null
-            });
-        }
-    },
+      return res.json(ok("直播已开始", {
+        streamId,
+        liveStatus,
+        aiStatus,
+        timestamp: Date.now()
+      }));
 
-    // 取消直播计划
-    cancelLiveSchedule: (req, res) => {
-        try {
-            liveService.cancelLiveSchedule();
-            res.json({
-                code: 0,
-                message: '直播计划已取消',
-                data: null
-            });
-        } catch (error) {
-            res.status(500).json({
-                code: -1,
-                message: '取消失败',
-                data: null
-            });
-        }
-    },
-
-    // 设置并开始直播
-    setupAndStartLive: (req, res) => {
-        try {
-            const result = liveService.setupAndStartLive(req.body);
-            const isSchedule = !req.body.startNow;
-
-            res.json({
-                code: 0,
-                message: isSchedule ? '直播计划已设置' : '直播已开始',
-                data: result
-            });
-        } catch (error) {
-            console.error('设置并开始直播失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: '操作失败',
-                data: null
-            });
-        }
-    },
-
-    // 获取观看人数（支持两种模式）
-    getViewersCount: (req, res) => {
-        try {
-            const streamId = req.query.stream_id || req.query.streamId;
-            
-            // 模拟人数波动
-            globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
-            if (globalViewers < 0) globalViewers = 0;
-            
-            // 如果没有 stream_id，返回所有流的数据（多直播总览用）
-            if (!streamId) {
-                res.json({
-                    code: 0,
-                    message: 'ok',
-                    data: {
-                        streams: {
-                            'mock-stream-1': Math.floor(Math.random() * 200),
-                            'mock-stream-2': Math.floor(Math.random() * 200)
-                        },
-                        timestamp: Date.now()
-                    }
-                });
-                return;
-            }
-            
-            // 有 stream_id，返回单个流的数据
-            res.json({
-                code: 0,
-                message: 'ok',
-                data: {
-                    streamId: streamId,
-                    viewers: globalViewers,
-                    timestamp: Date.now()
-                }
-            });
-        } catch (error) {
-            console.error('获取观看人数失败:', error);
-            res.status(500).json({
-                code: -1,
-                message: '获取失败',
-                data: null
-            });
-        }
-    },
-
-    // 开始直播
-    startLive: (req, res) => {
-        try {
-            const { streamId, stream_id, autoStartAI = true, notifyUsers = true } = req.body;
-            const finalStreamId = streamId || stream_id;
-            console.log('🚀 收到开始直播请求:', { streamId: finalStreamId, autoStartAI });
-            
-            // 直接返回响应，避免调用可能导致卡住的服务方法
-            return res.json({
-                code: 0,
-                message: '直播已开始',
-                data: {
-                    streamId: finalStreamId,
-                    status: 'running',
-                    aiStatus: autoStartAI ? 'running' : 'stopped',
-                    notifyUsers,
-                    timestamp: Date.now()
-                }
-            });
-        } catch (error) {
-            console.error('开始直播失败:', error);
-            return res.status(400).json({
-                code: -1,
-                message: error.message || '开始直播失败',
-                data: null
-            });
-        }
-    },
-
-    // 停止直播
-    stopLive: (req, res) => {
-        try {
-            const { streamId, stream_id, saveStatistics = true, notifyUsers = true } = req.body;
-            const finalStreamId = streamId || stream_id;
-            console.log('🛑 收到停止直播请求:', { streamId: finalStreamId });
-            
-            // 直接返回响应，避免调用可能导致卡住的服务方法
-            return res.json({
-                code: 0,
-                message: '直播已停止',
-                data: {
-                    streamId: finalStreamId,
-                    status: 'stopped',
-                    aiStatus: 'stopped',
-                    timestamp: Date.now()
-                }
-            });
-        } catch (error) {
-            console.error('停止直播失败:', error);
-            return res.status(400).json({
-                code: -1,
-                message: error.message || '停止直播失败',
-                data: null
-            });
-        }
-    },
-
-    // 更新投票
-    updateVotes: (req, res) => {
-        try {
-            const { action, leftVotes: L, rightVotes: R, reason = '', notifyUsers = true, streamId } = req.body;
-            console.log('📊 收到更新投票请求:', { action, leftVotes: L, rightVotes: R, streamId });
-            
-            const result = liveService.updateVotes(action, L, R, reason, notifyUsers, streamId);
-            
-            res.json({
-                code: 0,
-                message: '投票更新成功',
-                data: {
-                    leftVotes: result.leftVotes,
-                    rightVotes: result.rightVotes,
-                    timestamp: Date.now()
-                }
-            });
-        } catch (error) {
-            console.error('更新投票失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: error.message || '更新投票失败',
-                data: null
-            });
-        }
-    },
-
-    // 重置投票
-    resetVotes: (req, res) => {
-        try {
-            const { leftVotes = 0, rightVotes = 0, saveBackup = true, notifyUsers = true, streamId } = req.body;
-            console.log('🔄 收到重置投票请求:', { leftVotes, rightVotes, streamId });
-            
-            const result = liveService.resetVotes(leftVotes, rightVotes, saveBackup, notifyUsers, streamId);
-            
-            res.json({
-                code: 0,
-                message: '投票数已重置',
-                data: result
-            });
-        } catch (error) {
-            console.error('重置投票失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: error.message || '重置投票失败',
-                data: null
-            });
-        }
-    },
-
-    // 广播观看人数
-    broadcastViewers: (req, res) => {
-        try {
-            const { streamId } = req.body;
-            console.log('👥 收到广播观看人数请求:', { streamId });
-            
-            const result = liveService.broadcastViewers(streamId);
-            
-            res.json({
-                code: 0,
-                message: '观看人数已广播',
-                data: result
-            });
-        } catch (error) {
-            console.error('广播观看人数失败:', error);
-            res.status(400).json({
-                code: -1,
-                message: error.message || '广播观看人数失败',
-                data: null
-            });
-        }
-    },
-
-    // 获取数据概览
-    getDashboard: (req, res) => {
-        try {
-            const streamId = req.query.stream_id || req.query.streamId;
-            console.log('📊 收到数据概览请求:', { streamId });
-
-            const liveStatus = liveService.getLiveStatus();
-            const votes = require('../services/voteService').getVotes();
-            const aiStatus = require('../state/aiState').getAIStatusForStream(streamId);
-
-            // 使用全局观看人数，确保与 viewers 接口一致
-            globalViewers = globalViewers + Math.floor(Math.random() * 10 - 5);
-            if (globalViewers < 0) globalViewers = 0;
-
-            const dashboardData = {
-                streamId: streamId,
-                leftVotes: votes.leftVotes,
-                rightVotes: votes.rightVotes,
-                viewers: globalViewers,
-                status: liveStatus.isLive ? 'running' : 'stopped',
-                aiStatus: aiStatus.status,
-                timestamp: Date.now()
-            };
-
-            res.json({
-                code: 0,
-                message: 'ok',
-                data: dashboardData
-            });
-        } catch (error) {
-            console.error('获取数据概览失败:', error);
-            res.status(500).json({
-                code: -1,
-                message: '获取数据概览失败',
-                data: null
-            });
-        }
+    } catch (err) {
+      console.error("❌ startLive 错误:", err);
+      return res.json(fail("服务器内部错误"));
     }
+  },
+
+  // ===============================
+  // 3. 停止直播
+  // ===============================
+  stopLive: (req, res) => {
+    liveStatus = "stopped";
+    aiStatus = "stopped";
+    currentStreamId = null;
+
+    return res.json(ok("直播已停止", {
+      liveStatus,
+      aiStatus
+    }));
+  },
+
+  // ===============================
+  // 4. 获取直播状态
+  // ===============================
+  getLiveStatus: (req, res) => {
+    res.json(ok("ok", {
+      liveStatus,
+      aiStatus,
+      currentStreamId,
+      timestamp: Date.now()
+    }));
+  },
+
+  // ===============================
+  // 5. 更新投票
+  // ===============================
+  updateVotes: (req, res) => {
+    const { side } = req.body;
+
+    if (side !== "left" && side !== "right") {
+      return res.json(fail("side 必须是 left 或 right"));
+    }
+
+    voteData[side] += 1;
+
+    res.json(ok("投票成功", voteData));
+  },
+
+  // ===============================
+  // 6. 重置投票
+  // ===============================
+  resetVotes: (req, res) => {
+    voteData = { left: 0, right: 0 };
+    res.json(ok("投票已重置", voteData));
+  },
+
+  // ===============================
+  // 7. 广播观看人数（模拟）
+  // ===============================
+  broadcastViewers: (req, res) => {
+    viewersCount = Math.floor(Math.random() * 200);
+    res.json(ok("观看人数已更新", { viewersCount }));
+  },
+
+  // ===============================
+  // 8. 管理员控制直播（暂停/继续等）
+  // ===============================
+  adminControlLive: (req, res) => {
+    const { action } = req.body;
+
+    if (action === "pause") liveStatus = "paused";
+    else if (action === "resume") liveStatus = "running";
+    else return res.json(fail("未知 action"));
+
+    res.json(ok("操作成功", { liveStatus }));
+  },
+
+  // ===============================
+  // 9. 用户控制直播（点赞等）
+  // ===============================
+  userControlLive: (req, res) => {
+    res.json(ok("用户操作成功"));
+  },
+
+  // ===============================
+  // 10. 设置直播计划
+  // ===============================
+  setLiveSchedule: (req, res) => {
+    liveSchedule = req.body;
+    res.json(ok("直播计划已设置", liveSchedule));
+  },
+
+  // ===============================
+  // 11. 获取直播计划
+  // ===============================
+  getLiveSchedule: (req, res) => {
+    res.json(ok("ok", liveSchedule || {}));
+  },
+
+  // ===============================
+  // 12. 取消直播计划
+  // ===============================
+  cancelLiveSchedule: (req, res) => {
+    liveSchedule = null;
+    res.json(ok("直播计划已取消"));
+  },
+
+  // ===============================
+  // 13. 一键配置并开始直播
+  // ===============================
+  setupAndStartLive: (req, res) => {
+    const { streamId } = req.body;
+
+    if (!streamId) return res.json(fail("缺少 streamId"));
+
+    liveStatus = "running";
+    aiStatus = "running";
+    currentStreamId = streamId;
+
+    res.json(ok("直播已配置并开始", {
+      streamId,
+      liveStatus,
+      aiStatus
+    }));
+  },
+
+  // ===============================
+  // 14. 获取观看人数
+  // ===============================
+  getViewersCount: (req, res) => {
+    res.json(ok("ok", { viewersCount }));
+  }
 };

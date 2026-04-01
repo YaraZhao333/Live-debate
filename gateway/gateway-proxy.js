@@ -151,6 +151,15 @@ server.listen(GATEWAY_PORT, '0.0.0.0', () => {
     console.log(`📋 监听端口: ${GATEWAY_PORT}`);
     console.log(`🔗 后端地址: ${BACKEND_URL}`);
     console.log('═══════════════════════════════════════');
+    
+    // Keep-alive ping 防止 Render 免费实例休眠
+    console.log('🔄 启动 Keep-alive ping 机制...');
+    setInterval(() => {
+        console.log('🟢 发送 Keep-alive ping 到后端...');
+        fetch(BACKEND_URL + "/health").catch(() => {
+            console.log('⚠️ Keep-alive ping 失败（后端可能正在启动）');
+        });
+    }, 30000); // 每 30 秒 ping 一次
 });
 
 module.exports = { app, server };
