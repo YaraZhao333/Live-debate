@@ -87,7 +87,8 @@ export default {
 			loading: true,
 			liveStreams: [],
 			wsConnection: null,
-			reconnectTimer: null
+			reconnectTimer: null,
+			pollTimer: null  // 轮询定时器
 		};
 	},
 	
@@ -95,14 +96,38 @@ export default {
 		console.log('📺 直播选择页面加载');
 		this.loadLiveStreams();
 		this.connectWebSocket();
+		this.startPolling();  // 启动轮询
 	},
 	
 	onShow() {
 		this.refreshStreams();
+		if (!this.pollTimer) {
+			this.startPolling();  // 页面显示时启动轮询
+		}
 	},
 	
 	onUnload() {
 		this.disconnectWebSocket();
+		this.stopPolling();  // 停止轮询
+	},
+	
+	// 启动轮询（作为 WebSocket 的后备方案）
+	startPolling() {
+		console.log('🔄 启动直播状态轮询');
+		// 每 5 秒轮询一次
+		this.pollTimer = setInterval(() => {
+			console.log('🔄 轮询直播状态...');
+			this.loadLiveStreams();
+		}, 5000);
+	},
+	
+	// 停止轮询
+	stopPolling() {
+		if (this.pollTimer) {
+			clearInterval(this.pollTimer);
+			this.pollTimer = null;
+			console.log('🛑 停止直播状态轮询');
+		}
 	},
 	
 	methods: {
