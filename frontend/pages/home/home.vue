@@ -3540,11 +3540,35 @@
 						break;
 						
 					case 'pong':
-						// 心跳响应
-						break;
-						
-					default:
-				}
+					// 心跳响应
+					break;
+					
+				case 'live-started':
+					// 直播开始事件（关键修复）
+					console.log('📡 收到直播开始事件:', data);
+					if (data.data) {
+						this.handleLiveStatusUpdate({
+							isLive: true,
+							streamUrl: data.data.streamUrl,
+							streamId: data.data.streamId
+						});
+					}
+					break;
+					
+				case 'live-status':
+					// 直播状态事件（连接时获取当前状态）
+					console.log('📡 收到直播状态:', data);
+					if (data.data) {
+						this.handleLiveStatusUpdate({
+							isLive: data.data.isLive,
+							streamUrl: data.data.streamUrl,
+							streamId: data.data.streamId
+						});
+					}
+					break;
+					
+				default:
+			}
 			},
 			
 		// 处理直播状态更新（WebSocket推送）
