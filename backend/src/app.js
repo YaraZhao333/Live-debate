@@ -20,14 +20,14 @@ const debateFlowRoutes = require('./routes/debateFlowRoutes');
 const statisticsRoutes = require('./routes/statisticsRoutes');
 const streamDetailRoutes = require('./routes/streamDetailRoutes');
 
-// 导入WebSocket服务
+// WebSocket
 const { setupWebSocketServer } = require('./websocket/wsServer');
 
-// 初始化Express应用
+// 初始化 Express
 const app = express();
 const server = http.createServer(app);
 
-// CORS配置
+// CORS
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -35,7 +35,7 @@ app.use(cors({
     credentials: true
 }));
 
-// 解析JSON请求体
+// JSON 解析
 app.use(express.json());
 
 // 禁用缓存
@@ -46,13 +46,13 @@ app.use((req, res, next) => {
     next();
 });
 
-// 配置WebSocket
+// WebSocket
 setupWebSocketServer(server);
 
-// 健康检查（Render 必需）
+// 健康检查
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
+    res.json({
+        status: 'ok',
         service: 'backend',
         timestamp: new Date().toISOString()
     });
@@ -60,23 +60,23 @@ app.get('/health', (req, res) => {
 
 /*  
 ========================================================
-🔥 关键修复：只保留 /api/v1 前缀
+🔥 关键修复：所有后台管理 API 必须挂载到 /api/v1/admin
 ========================================================
 */
-app.use('/api/v1', voteRoutes);
-app.use('/api/v1', liveRoutes);
-app.use('/api/v1', adminRoutes);
-app.use('/api/v1', aiRoutes);
-app.use('/api/v1', streamsRoutes);
-app.use('/api/v1', userVoteRoutes);
-app.use('/api/v1', debateTopicRoutes);
-app.use('/api/v1', aiContentRoutes);
-app.use('/api/v1', commentRoutes);
-app.use('/api/v1', wechatLoginRoutes);
-app.use('/api/v1', authRoutes);
-app.use('/api/v1', judgesRoutes);
-app.use('/api/v1', debateFlowRoutes);
-app.use('/api/v1', statisticsRoutes);
-app.use('/api/v1', streamDetailRoutes);
+app.use('/api/v1/admin', voteRoutes);
+app.use('/api/v1/admin', liveRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/admin', aiRoutes);
+app.use('/api/v1/admin', streamsRoutes);
+app.use('/api/v1/admin', userVoteRoutes);
+app.use('/api/v1/admin', debateTopicRoutes);
+app.use('/api/v1/admin', aiContentRoutes);
+app.use('/api/v1/admin', commentRoutes);
+app.use('/api/v1/admin', wechatLoginRoutes);
+app.use('/api/v1/admin', authRoutes);
+app.use('/api/v1/admin', judgesRoutes);
+app.use('/api/v1/admin', debateFlowRoutes);
+app.use('/api/v1/admin', statisticsRoutes);
+app.use('/api/v1/admin', streamDetailRoutes);
 
 module.exports = { app, server };
