@@ -209,12 +209,27 @@ module.exports = {
             const finalStreamId = streamId || stream_id;
             console.log('🚀 收到开始直播请求:', { streamId: finalStreamId, autoStartAI });
             
-            // 直接返回响应，避免调用可能导致卡住的服务方法
+            if (!finalStreamId) {
+                return res.status(400).json({
+                    code: -1,
+                    message: "stream_id 不能为空",
+                    data: null
+                });
+            }
+            
+            // 调用服务方法真正开始直播
+            const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
+            
+            // 返回前端可播放的 HLS 测试流
+            const playHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+            
             return res.json({
                 code: 0,
                 message: '直播已开始',
                 data: {
+                    stream_id: finalStreamId,
                     streamId: finalStreamId,
+                    play_hls: playHls,
                     status: 'running',
                     aiStatus: autoStartAI ? 'running' : 'stopped',
                     notifyUsers,
@@ -238,7 +253,17 @@ module.exports = {
             const finalStreamId = streamId || stream_id;
             console.log('🛑 收到停止直播请求:', { streamId: finalStreamId });
             
-            // 直接返回响应，避免调用可能导致卡住的服务方法
+            if (!finalStreamId) {
+                return res.status(400).json({
+                    code: -1,
+                    message: "stream_id 不能为空",
+                    data: null
+                });
+            }
+            
+            // 调用服务方法真正停止直播
+            const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
+            
             return res.json({
                 code: 0,
                 message: '直播已停止',
