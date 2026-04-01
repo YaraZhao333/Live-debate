@@ -238,11 +238,10 @@ const streamsController = {
 				});
 			}
 			
-			// 模拟返回RTMP转HLS的地址
-			// 实际项目中，这里应该调用真实的转码服务
-			const pushUrl = `rtmp://localhost/live/${roomName}`;
-			const playFlv = `/live/${roomName}.flv`;
-			const playHls = `/live/${roomName}/index.m3u8`;
+			// 使用可播放的测试HLS地址
+			const pushUrl = `rtmp://example.com/live/${roomName}`;
+			const playFlv = '';
+			const playHls = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
 			
 			res.json({
 				code: 0,
