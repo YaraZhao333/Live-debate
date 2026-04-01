@@ -63,6 +63,14 @@ const backendProxy = createProxyMiddleware({
     },
     onProxyReq: (proxyReq, req, res) => {
         console.log(`🔄 [代理] ${req.method} ${req.path} -> ${BACKEND_URL}${req.path}`);
+        
+        // 修复：如果请求体已被解析，需要重新写入
+        if (req.body && Object.keys(req.body).length > 0) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+        }
     },
     onProxyRes: (proxyRes, req, res) => {
         console.log(`✅ [代理] ${req.path} <- ${proxyRes.statusCode} ${BACKEND_URL}`);
@@ -88,6 +96,14 @@ app.use('/api/v1/admin', createProxyMiddleware({
     },
     onProxyReq: (proxyReq, req, res) => {
         console.log(`🔄 [Admin代理] ${req.method} ${req.path} -> ${BACKEND_URL}${req.path}`);
+        
+        // 修复：如果请求体已被解析，需要重新写入
+        if (req.body && Object.keys(req.body).length > 0) {
+            const bodyData = JSON.stringify(req.body);
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+            proxyReq.write(bodyData);
+        }
     },
     onProxyRes: (proxyRes, req, res) => {
         console.log(`✅ [Admin代理] ${req.path} <- ${proxyRes.statusCode} ${BACKEND_URL}`);
