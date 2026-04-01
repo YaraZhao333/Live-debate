@@ -19,18 +19,32 @@ try {
 
 // 广播消息给所有客户端
 function broadcast(type, data) {
-    if (!wss || wsClients.size === 0) return;
+    console.log(`📢 [广播] 准备广播消息: type=${type}, 客户端数量=${wsClients.size}`);
+    
+    if (!wss) {
+        console.log('⚠️ [广播] WebSocket 服务器未初始化');
+        return;
+    }
+    
+    if (wsClients.size === 0) {
+        console.log('⚠️ [广播] 没有连接的客户端');
+        return;
+    }
 
     const message = JSON.stringify({ type, data, timestamp: Date.now() });
+    console.log(`📢 [广播] 发送消息: ${message.substring(0, 200)}...`);
 
     // 移除已关闭的连接并发送消息
+    let sentCount = 0;
     wsClients.forEach(client => {
         if (client.readyState === 1) { // WebSocket.OPEN
             client.send(message);
+            sentCount++;
         } else {
             wsClients.delete(client);
         }
     });
+    console.log(`📢 [广播] 消息已发送给 ${sentCount} 个客户端`);
 }
 
 // 广播当前状态（用于新连接）
