@@ -221,12 +221,12 @@ module.exports = {
                 });
             }
             
-            // 设置直播状态为 online
+            // 先调用服务方法开始直播，确保 liveState 状态被正确更新
+            const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
+            
+            // 同步更新 mockService.live 状态，保持与 liveState 一致
             mockService.live.status = "online";
             mockService.live.currentStream = finalStreamId;
-            
-            // 调用服务方法真正开始直播
-            const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
             
             // 返回前端可播放的 HLS 测试流
             const playHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
@@ -268,12 +268,12 @@ module.exports = {
                 });
             }
             
-            // 设置直播状态为 offline
+            // 先调用服务方法停止直播，确保 liveState 状态被正确更新
+            const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
+            
+            // 同步更新 mockService.live 状态，保持与 liveState 一致
             mockService.live.status = "offline";
             mockService.live.currentStream = null;
-            
-            // 调用服务方法真正停止直播
-            const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
             
             return res.json({
                 code: 0,
