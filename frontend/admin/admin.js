@@ -2578,12 +2578,78 @@ function refreshMultiLiveOverview() {
 }
 
 /**
- * 查看流详情（占位函数，将来实现详情页）
+ * 查看流详情
  */
-function viewStreamDetail(streamId) {
+async function viewStreamDetail(streamId) {
 	console.log('📊 查看流详情:', streamId);
-	// TODO: 实现流详情页面
-	alert(`流详情功能开发中...\n流ID: ${streamId}\n\n提示：此功能将在下一阶段实现，届时会显示：\n- 实时投票详情\n- 在线用户列表\n- AI识别内容\n- 直播数据图表`);
+	try {
+		const API_BASE = getAPIBase();
+		const response = await fetch(`${API_BASE}/api/v1/admin/streams/detail?stream_id=${streamId}`);
+		const result = await response.json();
+		
+		if (result.code === 0 && result.data) {
+			const { stream, judges, debateFlow, aiContents, votes, onlineUsers, aiState } = result.data;
+			
+			let detailText = `【${stream.name}】详情\n`;
+			detailText += `───────────────────\n`;
+			detailText += `🔹 流ID: ${stream.id}\n`;
+			detailText += `🔹 状态: ${stream.enabled ? '启用' : '禁用'}\n`;
+			detailText += `🔹 类型: ${stream.type?.toUpperCase() || 'HLS'}\n\n`;
+			
+			detailText += `【投票数据】\n`;
+			detailText += `───────────────────\n`;
+			detailText += `✅ 正方: ${votes?.left || 0} 票\n`;
+			detailText += `❌ 反方: ${votes?.right || 0} 票\n`;
+			detailText += `👥 总投票: ${(votes?.left || 0) + (votes?.right || 0)} 票\n\n`;
+			
+			detailText += `【评委信息】 (${judges?.length || 0}人)\n`;
+			detailText += `───────────────────\n`;
+			if (judges && judges.length > 0) {
+				judges.forEach((judge, i) => {
+					detailText += `${i + 1}. ${judge.name} (${judge.role}) - ${judge.votes || 0}票\n`;
+				});
+			} else {
+				detailText += `暂无评委配置\n`;
+			}
+			detailText += `\n`;
+			
+			detailText += `【辩论流程】 (${debateFlow?.length || 0}个环节)\n`;
+			detailText += `───────────────────\n`;
+			if (debateFlow && debateFlow.length > 0) {
+				debateFlow.forEach((seg, i) => {
+					detailText += `${i + 1}. ${seg.name} - ${seg.duration}秒\n`;
+				});
+			} else {
+				detailText += `暂无流程配置\n`;
+			}
+			detailText += `\n`;
+			
+			detailText += `【AI识别状态】\n`;
+			detailText += `───────────────────\n`;
+			detailText += `状态: ${aiState?.running ? '运行中' : '已停止'}\n`;
+			detailText += `AI内容: ${aiContents?.length || 0} 条\n\n`;
+			
+			detailText += `【在线用户】 (${onlineUsers?.length || 0}人)\n`;
+			detailText += `───────────────────\n`;
+			if (onlineUsers && onlineUsers.length > 0) {
+				onlineUsers.slice(0, 5).forEach((user, i) => {
+					detailText += `${i + 1}. ${user.nickname || user.name || '用户' + user.id}\n`;
+				});
+				if (onlineUsers.length > 5) {
+					detailText += `... 还有 ${onlineUsers.length - 5} 人\n`;
+				}
+			} else {
+				detailText += `暂无在线用户\n`;
+			}
+			
+			alert(detailText);
+		} else {
+			throw new Error(result.message || '获取详情失败');
+		}
+	} catch (error) {
+		console.error('❌ 获取流详情失败:', error);
+		alert(`获取流详情失败: ${error.message}\n流ID: ${streamId}`);
+	}
 }
 
 /**

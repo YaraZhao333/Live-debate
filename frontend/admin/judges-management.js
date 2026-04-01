@@ -182,13 +182,14 @@ function handleStreamChange(e) {
  */
 async function loadJudgesDataForStream(streamId) {
 	try {
-		// TODO: 调用后端API获取评委数据
-		// const response = await fetch(`${getAPIBase()}/api/v1/admin/judges?stream_id=${streamId}`);
-		// const result = await response.json();
-		// judgesData = result.data || judgesData;
-
-		// 暂时使用默认数据
-		console.log('📝 加载评委数据 (使用默认数据)');
+		const response = await fetch(`${getAPIBase()}/api/v1/admin/judges?stream_id=${streamId}`);
+		const result = await response.json();
+		if (result.code === 0 && result.data) {
+			judgesData = result.data;
+			console.log('✅ 加载评委数据成功:', judgesData);
+		} else {
+			console.warn('⚠️ 加载评委数据返回非成功状态:', result);
+		}
 		updateJudgesUI();
 	} catch (error) {
 		console.error('❌ 加载评委数据失败:', error);
@@ -435,25 +436,24 @@ async function saveJudgesData() {
 	});
 
 	try {
-		// TODO: 调用后端API保存数据
-		// const response = await fetch(`${getAPIBase()}/api/v1/admin/judges`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({
-		// 		stream_id: currentStreamId,
-		// 		judges: updatedJudges
-		// 	})
-		// });
+		const response = await fetch(`${getAPIBase()}/api/v1/admin/judges`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				stream_id: currentStreamId,
+				judges: updatedJudges
+			})
+		});
+		const result = await response.json();
 
-		// 暂时只更新本地数据
-		judgesData = updatedJudges;
-		console.log('💾 保存评委数据:', judgesData);
-
-		showNotification('评委信息保存成功', 'success');
-
-		// TODO: 通知大屏幕更新
-		notifyVoteDisplayUpdate();
-
+		if (result.code === 0) {
+			judgesData = updatedJudges;
+			console.log('💾 保存评委数据成功:', judgesData);
+			showNotification('评委信息保存成功', 'success');
+			notifyVoteDisplayUpdate();
+		} else {
+			throw new Error(result.message || '保存失败');
+		}
 	} catch (error) {
 		console.error('❌ 保存评委数据失败:', error);
 		showNotification('保存失败,请重试', 'error');

@@ -34,25 +34,120 @@ const mockData = {
 	users: [
 		{
 			id: 'mock-user-1',
-			nickname: '用户1',
+			nickname: '小明',
 			avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
-			createdAt: new Date().toISOString(),
+			createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
 			updatedAt: new Date().toISOString(),
-			totalVotes: 5,
-			joinedDebates: 2,
+			totalVotes: 28,
+			joinedDebates: 5,
 			status: 'active'
 		},
 		{
 			id: 'mock-user-2',
-			nickname: '用户2',
+			nickname: '小红',
 			avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
-			createdAt: new Date().toISOString(),
+			createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
 			updatedAt: new Date().toISOString(),
-			totalVotes: 3,
-			joinedDebates: 1,
+			totalVotes: 15,
+			joinedDebates: 3,
+			status: 'active'
+		},
+		{
+			id: 'mock-user-3',
+			nickname: '小李',
+			avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
+			createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+			updatedAt: new Date().toISOString(),
+			totalVotes: 42,
+			joinedDebates: 8,
+			status: 'active'
+		},
+		{
+			id: 'mock-user-4',
+			nickname: '小王',
+			avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4',
+			createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+			updatedAt: new Date().toISOString(),
+			totalVotes: 8,
+			joinedDebates: 2,
+			status: 'inactive'
+		},
+		{
+			id: 'mock-user-5',
+			nickname: '小张',
+			avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=5',
+			createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+			updatedAt: new Date().toISOString(),
+			totalVotes: 67,
+			joinedDebates: 12,
 			status: 'active'
 		}
 	],
+
+	judges: {
+		'mock-stream-1': [
+			{
+				id: 'judge-1',
+				name: '张教授',
+				role: '主评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge1',
+				votes: 5
+			},
+			{
+				id: 'judge-2',
+				name: '李博士',
+				role: '嘉宾评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge2',
+				votes: 3
+			},
+			{
+				id: 'judge-3',
+				name: '王律师',
+				role: '嘉宾评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge3',
+				votes: 2
+			}
+		],
+		'mock-stream-2': [
+			{
+				id: 'judge-1',
+				name: '陈老师',
+				role: '主评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge4',
+				votes: 0
+			},
+			{
+				id: 'judge-2',
+				name: '刘专家',
+				role: '嘉宾评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge5',
+				votes: 0
+			},
+			{
+				id: 'judge-3',
+				name: '赵顾问',
+				role: '嘉宾评委',
+				avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge6',
+				votes: 0
+			}
+		]
+	},
+	
+	debateFlowStates: {},
+
+	debateFlows: {
+		'mock-stream-1': [
+			{ id: 'seg-1', name: '开场陈述', duration: 180 },
+			{ id: 'seg-2', name: '自由辩论', duration: 300 },
+			{ id: 'seg-3', name: '总结陈词', duration: 120 }
+		],
+		'mock-stream-2': [
+			{ id: 'seg-1', name: '开篇立论', duration: 240 },
+			{ id: 'seg-2', name: '攻辩环节', duration: 180 },
+			{ id: 'seg-3', name: '自由辩论', duration: 240 },
+			{ id: 'seg-4', name: '总结陈词', duration: 180 }
+		]
+	},
 	
 	votes: {
 		leftVotes: 45,
@@ -399,6 +494,119 @@ const liveSchedule = {
 	}
 };
 
+// 评委管理
+const judges = {
+	getByStreamId: (streamId) => {
+		return mockData.judges[streamId] || [
+			{ id: 'judge-1', name: '评委一', role: '主评委', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge1', votes: 0 },
+			{ id: 'judge-2', name: '评委二', role: '嘉宾评委', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge2', votes: 0 },
+			{ id: 'judge-3', name: '评委三', role: '嘉宾评委', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=judge3', votes: 0 }
+		];
+	},
+
+	updateByStreamId: (streamId, judgesList) => {
+		mockData.judges[streamId] = judgesList;
+		return mockData.judges[streamId];
+	}
+};
+
+// 辩论流程管理
+const debateFlows = {
+	getByStreamId: (streamId) => {
+		return mockData.debateFlows[streamId] || [
+			{ id: 'seg-1', name: '开场陈述', duration: 180 },
+			{ id: 'seg-2', name: '自由辩论', duration: 300 },
+			{ id: 'seg-3', name: '总结陈词', duration: 120 }
+		];
+	},
+
+	updateByStreamId: (streamId, segments) => {
+		mockData.debateFlows[streamId] = segments;
+		return mockData.debateFlows[streamId];
+	}
+};
+
+// 辩论流程控制
+const debateFlowControls = {
+	getState: (streamId) => {
+		if (!mockData.debateFlowStates[streamId]) {
+			mockData.debateFlowStates[streamId] = {
+				currentSegmentIndex: 0,
+				remainingTime: 0,
+				isRunning: false,
+				isPaused: false,
+				startTime: null,
+				pauseTime: null,
+				segmentName: ''
+			};
+		}
+		return mockData.debateFlowStates[streamId];
+	},
+
+	control: (streamId, action, segmentIndex = 0) => {
+		const state = debateFlowControls.getState(streamId);
+		const segments = debateFlows.getByStreamId(streamId);
+
+		switch (action) {
+			case 'start':
+				state.currentSegmentIndex = Math.max(0, Math.min(segmentIndex, segments.length - 1));
+				state.remainingTime = segments[state.currentSegmentIndex]?.duration || 180;
+				state.isRunning = true;
+				state.isPaused = false;
+				state.startTime = Date.now();
+				state.pauseTime = null;
+				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
+				break;
+
+			case 'pause':
+				if (state.isRunning) {
+					state.isPaused = true;
+					state.pauseTime = Date.now();
+				}
+				break;
+
+			case 'resume':
+				if (state.isPaused) {
+					state.isPaused = false;
+					state.startTime = Date.now() - (state.pauseTime - (state.startTime || 0));
+					state.pauseTime = null;
+				}
+				break;
+
+			case 'reset':
+				state.currentSegmentIndex = 0;
+				state.remainingTime = segments[0]?.duration || 180;
+				state.isRunning = false;
+				state.isPaused = false;
+				state.startTime = null;
+				state.pauseTime = null;
+				state.segmentName = segments[0]?.name || '';
+				break;
+
+			case 'next':
+				state.currentSegmentIndex = Math.min(state.currentSegmentIndex + 1, segments.length - 1);
+				state.remainingTime = segments[state.currentSegmentIndex]?.duration || 180;
+				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
+				state.startTime = Date.now();
+				break;
+
+			case 'prev':
+				state.currentSegmentIndex = Math.max(state.currentSegmentIndex - 1, 0);
+				state.remainingTime = segments[state.currentSegmentIndex]?.duration || 180;
+				state.segmentName = segments[state.currentSegmentIndex]?.name || '';
+				state.startTime = Date.now();
+				break;
+		}
+
+		return {
+			...state,
+			action,
+			segmentIndex: state.currentSegmentIndex,
+			timestamp: new Date().toISOString()
+		};
+	}
+};
+
 // 生成动态AI辩论内容
 function generateAIDebateContent(topic, position) {
 	const args = {
@@ -450,6 +658,9 @@ module.exports = {
 	aiContent,
 	statistics,
 	liveSchedule,
+	judges,
+	debateFlows,
+	debateFlowControls,
 	generateAIDebateContent,
 	generateVoteData
 };
