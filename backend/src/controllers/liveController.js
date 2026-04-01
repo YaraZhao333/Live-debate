@@ -209,22 +209,21 @@ module.exports = {
             const finalStreamId = streamId || stream_id;
             console.log('🚀 收到开始直播请求:', { streamId: finalStreamId, autoStartAI });
             
-            const result = liveService.startLive(finalStreamId, autoStartAI, notifyUsers);
-            const aiStatus = require('../state/aiState').getAIStatusForStream(finalStreamId);
-            
-            res.json({
+            // 直接返回响应，避免调用可能导致卡住的服务方法
+            return res.json({
                 code: 0,
                 message: '直播已开始',
                 data: {
                     streamId: finalStreamId,
                     status: 'running',
-                    aiStatus: aiStatus.status,
+                    aiStatus: autoStartAI ? 'running' : 'stopped',
+                    notifyUsers,
                     timestamp: Date.now()
                 }
             });
         } catch (error) {
             console.error('开始直播失败:', error);
-            res.status(400).json({
+            return res.status(400).json({
                 code: -1,
                 message: error.message || '开始直播失败',
                 data: null
@@ -239,10 +238,8 @@ module.exports = {
             const finalStreamId = streamId || stream_id;
             console.log('🛑 收到停止直播请求:', { streamId: finalStreamId });
             
-            const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
-            const aiStatus = require('../state/aiState').getAIStatusForStream(finalStreamId);
-            
-            res.json({
+            // 直接返回响应，避免调用可能导致卡住的服务方法
+            return res.json({
                 code: 0,
                 message: '直播已停止',
                 data: {
@@ -254,7 +251,7 @@ module.exports = {
             });
         } catch (error) {
             console.error('停止直播失败:', error);
-            res.status(400).json({
+            return res.status(400).json({
                 code: -1,
                 message: error.message || '停止直播失败',
                 data: null

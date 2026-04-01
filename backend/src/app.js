@@ -27,7 +27,7 @@ const { setupWebSocketServer } = require('./websocket/wsServer');
 const app = express();
 const server = http.createServer(app);
 
-// CORS配置 - 允许所有来源（开发环境）
+// CORS配置
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -38,7 +38,7 @@ app.use(cors({
 // 解析JSON请求体
 app.use(express.json());
 
-// 全局缓存控制中间件 - 禁用缓存
+// 禁用缓存
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Pragma', 'no-cache');
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
 // 配置WebSocket
 setupWebSocketServer(server);
 
-// 健康检查端点（Render必需）
+// 健康检查（Render 必需）
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'ok', 
@@ -58,22 +58,11 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API路由挂载
-app.use('/api', voteRoutes);
-app.use('/api', liveRoutes);
-app.use('/api', adminRoutes);
-app.use('/api', aiRoutes);
-app.use('/api', streamsRoutes);
-app.use('/api', userVoteRoutes);
-app.use('/api', debateTopicRoutes);
-app.use('/api', aiContentRoutes);
-app.use('/api', commentRoutes);
-app.use('/api', wechatLoginRoutes);
-app.use('/api', authRoutes);
-app.use('/api', judgesRoutes);
-app.use('/api', debateFlowRoutes);
-app.use('/api', statisticsRoutes);
-app.use('/api', streamDetailRoutes);
+/*  
+========================================================
+🔥 关键修复：只保留 /api/v1 前缀
+========================================================
+*/
 app.use('/api/v1', voteRoutes);
 app.use('/api/v1', liveRoutes);
 app.use('/api/v1', adminRoutes);
