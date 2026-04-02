@@ -67,9 +67,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 然后加载 Dashboard（此时应该已经有流ID了）
 	loadDashboard();
 	
+	// 加载直播流状态
+	loadAllStreamsStatus();
+	
 	initWebSocket();
 	// 仍然保留定时更新作为后备（如果 WebSocket 断开）
 	setInterval(updateDashboard, 10000); // 每10秒更新一次数据作为后备
+	
+	// 每10秒刷新一次直播流状态
+	setInterval(() => {
+		console.log('🔄 自动刷新直播流状态');
+		loadAllStreamsStatus();
+	}, 10000);
 });
 
 // 初始化 WebSocket 连接
@@ -263,6 +272,25 @@ function handleWebSocketMessage(message) {
 			};
 			updateVotesDisplay(message.data);
 			showNotification('票数已更新', 'success');
+			
+			// 更新流列表中相应流的总票数
+			const streamId = message.data.streamId || message.data.liveId;
+			if (streamId) {
+				const totalVotes = (message.data.leftVotes || 0) + (message.data.rightVotes || 0);
+				const streamCard = document.querySelector(`[data-stream-id="${streamId}"]`);
+				if (streamCard) {
+					const totalVotesEl = streamCard.querySelector('.total-votes-count');
+					if (totalVotesEl) {
+						totalVotesEl.textContent = totalVotes;
+						// 添加动画效果
+						totalVotesEl.classList.add('highlight');
+						setTimeout(() => {
+							totalVotesEl.classList.remove('highlight');
+						}, 1000);
+						console.log(`✅ 已更新流 ${streamId} 的总票数: ${totalVotes}`);
+					}
+				}
+			}
 			break;
 		case 'ai-started':
 			// AI识别启动 - 🔧 修复：只更新匹配的流
@@ -1523,23 +1551,44 @@ async function loadAllStreamsStatus() {
 			streams = result;
 		}
 
+		// 为每个流获取Dashboard数据，包含在线用户、观看人数和总票数
+		const streamsWithDashboard = await Promise.all(
+			streams.map(async (stream) => {
+				try {
+					const dashboardResponse = await fetch(`${SERVER_CONFIG.BASE_URL}/api/v1/dashboard?stream_id=${stream.id}`);
+					const dashboardData = await dashboardResponse.json();
+					const dashboard = dashboardData.data || dashboardData;
+					return {
+						...stream,
+						dashboard: dashboard
+					};
+				} catch (error) {
+					console.warn('获取流', stream.id, '的Dashboard数据失败:', error);
+					return stream;
+				}
+			})
+		);
+
 		const container = document.getElementById('all-streams-status');
 		if (!container) return;
 
-		if (streams.length === 0) {
+		if (streamsWithDashboard.length === 0) {
 			container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">暂无直播流</div>';
 			return;
 		}
 
-		// 找出当前正在直播的流
-		const liveStream = streams.find(s => s.liveStatus && s.liveStatus.isLive);
-
 		// 生成状态列表HTML - 增强版本，支持流的独立状态管理
-		container.innerHTML = streams.map(stream => {
+		container.innerHTML = streamsWithDashboard.map(stream => {
 			const status = stream.liveStatus || {};
 			const isLive = status.isLive || false;
 			const startTime = status.startTime ? new Date(status.startTime).toLocaleString('zh-CN') : '-';
 			const duration = status.startTime ? calculateDuration(status.startTime) : '-';
+			
+			// 从Dashboard获取实时数据
+			const dashboard = stream.dashboard || {};
+			const activeUsers = dashboard.activeUsers || 0;
+			const viewersCount = dashboard.viewersCount || dashboard.activeUsers || 0;
+			const totalVotes = dashboard.totalVotes || (dashboard.leftVotes || 0) + (dashboard.rightVotes || 0);
 
 			// 状态徽章样式
 			const statusBadgeColor = isLive ? '#27ae60' : '#95a5a6';
@@ -1558,7 +1607,7 @@ async function loadAllStreamsStatus() {
 			const selectedStyle = isSelected ? 'border: 2px solid #667eea; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.15);' : '';
 
 			return `
-				<div style="border: 1px solid ${statusBorderColor}; border-radius: 8px; padding: 18px; background: ${statusBgColor}; ${selectedStyle} transition: all 0.3s ease;">
+				<div style="border: 1px solid ${statusBorderColor}; border-radius: 8px; padding: 18px; background: ${statusBgColor}; ${selectedStyle} transition: all 0.3s ease;" data-stream-id="${stream.id}">
 					<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
 						<!-- 左侧流信息 -->
 						<div style="flex: 1; min-width: 0;">
@@ -1577,7 +1626,7 @@ async function loadAllStreamsStatus() {
 							</div>
 
 							<!-- 直播状态 -->
-							<div style="display: flex; align-items: center; gap: 15px; font-size: 13px;">
+							<div style="display: flex; align-items: center; gap: 15px; font-size: 13px; margin-bottom: 8px;">
 								<div>
 									<strong>状态:</strong>
 									<span style="color: ${statusBadgeColor}; font-weight: bold; margin-left: 4px;">
@@ -1592,6 +1641,19 @@ async function loadAllStreamsStatus() {
 										<strong>时长:</strong> <span style="color: #999;">${duration}</span>
 									</div>
 								` : ''}
+							</div>
+							
+							<!-- 实时数据统计 -->
+							<div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; margin-top: 8px;">
+								<div style="background: #f8f9fa; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #3498db;">
+									<strong>在线用户:</strong> <span style="color: #3498db;">${activeUsers}</span>
+								</div>
+								<div style="background: #f8f9fa; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #e67e22;">
+									<strong>观看人数:</strong> <span style="color: #e67e22;" class="viewers-count">${viewersCount}</span>
+								</div>
+								<div style="background: #f8f9fa; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #27ae60;">
+									<strong>总票数:</strong> <span style="color: #27ae60;" class="total-votes-count">${totalVotes}</span>
+								</div>
 							</div>
 						</div>
 

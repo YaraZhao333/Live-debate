@@ -3585,6 +3585,28 @@
 						});
 					}
 					break;
+				
+				case 'live-stopped':
+					// 直播停止事件（关键修复）
+					console.log('📡 收到直播停止事件:', data);
+					this.handleLiveStatusUpdate({
+						isLive: false,
+						streamUrl: null,
+						streamId: data.data?.streamId
+					});
+					// 显示直播已结束的提示
+					uni.showToast({
+						title: '直播已结束',
+						icon: 'none',
+						duration: 2000
+					});
+					// 延迟跳转到直播选择页面
+					setTimeout(() => {
+						uni.redirectTo({
+							url: '/pages/live-select/live-select'
+						});
+					}, 1500);
+					break;
 					
 				default:
 			}
