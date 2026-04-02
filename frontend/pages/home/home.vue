@@ -747,7 +747,7 @@
 								const dashboardData = await service.getDashboard(this.streamId);
 								if (dashboardData) {
 									// 优先使用正在使用的流地址，否则使用启用的流地址
-									const streamUrl = dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
+									const streamUrl = dashboardData.streamUrl || dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
 									if (streamUrl) {
 											// 使用智能转换方法设置HLS流地址
 											await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
@@ -1116,10 +1116,11 @@
 							// 直播从停止变为开始
 							
 							// 确保流地址存在
-							if (!this.liveStreamUrl && dashboardData.liveStreamUrl) {
-								// 使用智能转换方法设置HLS流地址
-								await this.setLiveStreamUrlWithHls(dashboardData.liveStreamUrl, dashboardData.activeStreamName);
-							}
+											if (!this.liveStreamUrl && (dashboardData.streamUrl || dashboardData.liveStreamUrl)) {
+												// 使用智能转换方法设置HLS流地址
+												const streamUrl = dashboardData.streamUrl || dashboardData.liveStreamUrl;
+												await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
+											}
 							
 							// 如果还是没有流地址，尝试从数据库获取
 							if (!this.liveStreamUrl) {
@@ -1277,7 +1278,7 @@
 						const dashboardData = await service.getDashboard(this.streamId);
 						if (dashboardData) {
 							// 优先使用正在使用的流地址，否则使用启用的流地址
-							const streamUrl = dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
+									const streamUrl = dashboardData.streamUrl || dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
 							if (streamUrl) {
 								// 使用智能转换方法设置HLS流地址
 								await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);

@@ -99,13 +99,13 @@ app.use('/api/v1', liveRoutes);
 
 // 前端小程序需要的AI内容接口 - 已包含在 aiRoutes 中
 
+// AI内容路由（前端直接访问，不需要/admin前缀）
+app.use('/api/v1', aiRoutes);
+
 // 前端小程序需要的流详情接口
 app.use('/api/v1', streamDetailRoutes);
 
 // 辩题路由（前端直接访问，不需要/admin前缀）
 app.use('/api/v1', debateTopicRoutes);
-
-// AI内容路由（前端直接访问，不需要/admin前缀）
-app.use('/api/v1', aiRoutes);
 
 module.exports = { app, server };
