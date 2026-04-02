@@ -443,11 +443,18 @@ const statistics = {
 		// 使用 mockData.live 状态来判断是否直播中（与 liveState 同步）
 		const isLive = mockData.live && mockData.live.status === 'online';
 		
+		// 获取当前活跃的直播流
+		const activeStream = mockData.streams.find(s => s.enabled === true);
+		const streamUrl = activeStream ? activeStream.url : null;
+		
 		return {
 			totalUsers: mockData.users.length,
 			activeUsers: mockData.users.filter(u => u.status === 'active').length,
 			totalVotes: mockData.statistics.totalVotes || 0,
-			isLive: isLive
+			isLive: isLive,
+			liveStreamUrl: streamUrl,
+			activeStreamUrl: streamUrl,
+			streamUrl: streamUrl
 		};
 	}
 };

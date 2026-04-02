@@ -381,10 +381,16 @@ module.exports = {
     // 重置投票
     resetVotes: (req, res) => {
         try {
-            const { leftVotes = 0, rightVotes = 0, saveBackup = true, notifyUsers = true, streamId } = req.body;
-            console.log('🔄 收到重置投票请求:', { leftVotes, rightVotes, streamId });
+            // 兼容两种请求格式：直接在body中或在resetTo对象中
+            const { resetTo, leftVotes = 0, rightVotes = 0, saveBackup = true, notifyUsers = true, streamId } = req.body;
             
-            const result = liveService.resetVotes(leftVotes, rightVotes, saveBackup, notifyUsers, streamId);
+            // 优先使用resetTo对象中的值
+            const finalLeftVotes = resetTo?.leftVotes ?? leftVotes;
+            const finalRightVotes = resetTo?.rightVotes ?? rightVotes;
+            
+            console.log('🔄 收到重置投票请求:', { leftVotes: finalLeftVotes, rightVotes: finalRightVotes, streamId });
+            
+            const result = liveService.resetVotes(finalLeftVotes, finalRightVotes, saveBackup, notifyUsers, streamId);
             
             res.json({
                 code: 0,

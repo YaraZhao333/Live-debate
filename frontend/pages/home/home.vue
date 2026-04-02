@@ -3073,23 +3073,30 @@
 				
 				// 优先级：服务器正在使用的流地址 > 数据库中启用的流地址 > 已有流地址
 				// 完全使用接口数据，不再使用配置文件默认值
-				if (serverStreamUrl) {
-					finalStreamUrl = serverStreamUrl;
-				} else if (activeStreamUrl) {
-					finalStreamUrl = activeStreamUrl;
-				} else if (this.liveStreamUrl) {
-					finalStreamUrl = this.liveStreamUrl;
+		if (serverStreamUrl) {
+			finalStreamUrl = serverStreamUrl;
+		} else if (activeStreamUrl) {
+			finalStreamUrl = activeStreamUrl;
+		} else if (this.liveStreamUrl) {
+			finalStreamUrl = this.liveStreamUrl;
+		} else {
+			// 如果所有接口都无法获取流地址，尝试通过 streams 接口获取
+			try {
+				const streamUrl = await this.fetchActiveStreamFromServerAlternative();
+				if (streamUrl) {
+					finalStreamUrl = streamUrl;
 				} else {
-					// 如果所有接口都无法获取流地址，尝试通过 streams 接口获取
-					try {
-						const streamUrl = await this.fetchActiveStreamFromServerAlternative();
-						if (streamUrl) {
-							finalStreamUrl = streamUrl;
-						} else {
-						}
-					} catch (streamsError) {
-					}
+					// 使用默认测试流地址作为最后备选
+					finalStreamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+					console.warn('使用默认测试流地址');
 				}
+			} catch (streamsError) {
+				console.error('获取 streams 接口失败:', streamsError);
+				// 使用默认测试流地址作为最后备选
+				finalStreamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+				console.warn('使用默认测试流地址');
+			}
+		}
 				
 				// 确保流地址有效（在设置状态之前）
 				if (!finalStreamUrl) {
