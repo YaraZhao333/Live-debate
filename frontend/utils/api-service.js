@@ -837,8 +837,8 @@ class ApiService {
   async getDashboard(streamId = null) {
     // 如果提供了 streamId，使用带参数的API查询特定流的Dashboard
     const url = streamId 
-      ? `/api/v1/admin/dashboard?stream_id=${streamId}`
-      : '/api/v1/admin/dashboard';
+      ? `/api/v1/dashboard?stream_id=${streamId}`
+      : '/api/v1/dashboard';
     const response = await this.request({ url, method: 'GET' });
     // 如果返回的是包装格式 { success: true, data: {...} }，提取 data 字段
     if (response && response.success && response.data) {

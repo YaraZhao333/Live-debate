@@ -94,7 +94,7 @@ app.use('/api/v1/admin', debateFlowRoutes);
 app.use('/api/v1/admin', statisticsRoutes);
 app.use('/api/v1/admin', streamDetailRoutes);
 
-// 前端小程序需要的直播状态接口
+// 前端小程序需要的直播状态接口 - 放在最前面，确保/dashboard路由优先匹配
 app.use('/api/v1', liveRoutes);
 
 // 前端小程序需要的AI内容接口 - 已包含在 aiRoutes 中
