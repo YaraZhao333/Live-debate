@@ -57,9 +57,6 @@
 
 - **前端访问地址**: https://live-debate-frontend.onrender.com
 - **后台管理页面**: https://live-debate-admin.onrender.com
-- **大屏幕展示页面**: https://live-debate-admin.onrender.com/vote-display.html
-- **网关地址**: https://live-debate-gateway.onrender.com
-- **后端 API 地址**: https://live-debate-gateway.onrender.com/api/v1
 
 > **注意**: 以上地址已部署到 Render 平台，可直接访问。
 > 
