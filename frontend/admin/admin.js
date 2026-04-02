@@ -11,10 +11,18 @@ const SERVER_CONFIG = {
 	GATEWAY_URL: 'https://live-debate-gateway.onrender.com',
 	// 当前使用的地址（修改这里切换服务器）
 	get BASE_URL() {
-		return 'https://live-debate-gateway.onrender.com';
+		// 检查当前域名，如果是远程域名则使用本地服务器
+		if (window.location.hostname === 'live-debate-admin.onrender.com') {
+			return 'http://localhost:8081';
+		}
+		return 'http://localhost:8081';
 	},
 	get WEB_SOCKET_URL() {
-		return 'https://live-debate-gateway.onrender.com';
+		// 检查当前域名，如果是远程域名则使用本地服务器
+		if (window.location.hostname === 'live-debate-admin.onrender.com') {
+			return 'http://localhost:8081';
+		}
+		return 'http://localhost:8081';
 	}
 };
 

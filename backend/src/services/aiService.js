@@ -19,14 +19,19 @@ const { broadcast } = require('../websocket/wsServer');
 // AI相关服务
 module.exports = {
     // 获取AI内容列表
-    getAIContentList: (page = 1, pageSize = 20, startTime = null, endTime = null) => {
+    getAIContentList: (page = 1, pageSize = 20, startTime = null, endTime = null, streamId = null) => {
         // 验证pageSize最大值
         if (pageSize > 100) {
             throw new Error('pageSize最大值为100');
         }
 
         // 过滤内容
-        const filteredContent = filterAIDebateContent(startTime, endTime);
+        let filteredContent = filterAIDebateContent(startTime, endTime);
+
+        // 根据streamId过滤
+        if (streamId) {
+            filteredContent = filteredContent.filter(item => item.streamId === streamId);
+        }
 
         // 计算总数
         const total = filteredContent.length;
@@ -45,8 +50,8 @@ module.exports = {
     },
 
     // 获取格式化的AI内容列表（V1 API）
-    getFormattedAIContentList: (page = 1, pageSize = 20, startTime = null, endTime = null) => {
-        const result = this.getAIContentList(page, pageSize, startTime, endTime);
+    getFormattedAIContentList: (page = 1, pageSize = 20, startTime = null, endTime = null, streamId = null) => {
+        const result = this.getAIContentList(page, pageSize, startTime, endTime, streamId);
 
         // 转换为文档格式
         const items = result.items.map(item => {
@@ -281,12 +286,12 @@ module.exports = {
 
     // 获取指定流的AI状态
     getAIStatusForStream: (streamId) => {
-        return getAIStatusForStream(streamId);
+        return require('../state/aiState').getAIStatusForStream(streamId);
     },
 
     // 启动AI识别
     startAI: (streamId, settings = {}) => {
-        const result = startAI(streamId, settings);
+        const result = require('../state/aiState').startAI(streamId, settings);
         broadcast('ai-status-changed', {
             streamId: streamId,
             status: 'running',
@@ -298,7 +303,7 @@ module.exports = {
 
     // 停止AI识别
     stopAI: (streamId) => {
-        const result = stopAI(streamId);
+        const result = require('../state/aiState').stopAI(streamId);
         broadcast('ai-status-changed', {
             streamId: streamId,
             status: 'stopped',
@@ -309,7 +314,7 @@ module.exports = {
 
     // 切换AI状态（暂停/恢复）
     toggleAI: (action, streamId) => {
-        const result = toggleAI(action, streamId);
+        const result = require('../state/aiState').toggleAI(action, streamId);
         broadcast('ai-status-changed', {
             streamId: streamId,
             status: result.status,

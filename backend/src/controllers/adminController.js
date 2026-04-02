@@ -41,6 +41,90 @@ module.exports = {
         }
     },
 
+    // 创建辩题
+    createDebate: (req, res) => {
+        try {
+            const debate = mockService.debate.create(req.body);
+            res.json({
+                code: 0,
+                message: '创建成功',
+                data: debate
+            });
+        } catch (error) {
+            console.error('创建辩题失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '创建失败',
+                data: null
+            });
+        }
+    },
+
+    // 获取单个辩题详情
+    getDebateById: (req, res) => {
+        try {
+            const debate = mockService.debate.getById(req.params.id);
+            if (!debate) {
+                return res.status(404).json({
+                    code: -1,
+                    message: '辩题不存在',
+                    data: null
+                });
+            }
+            res.json({
+                code: 0,
+                message: 'success',
+                data: debate
+            });
+        } catch (error) {
+            console.error('获取辩题失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '获取失败',
+                data: null
+            });
+        }
+    },
+
+    // 关联辩题到直播流
+    associateDebateToStream: (req, res) => {
+        try {
+            const { debate_id } = req.body;
+            const result = mockService.debate.associateToStream(req.params.streamId, debate_id);
+            res.json({
+                code: 0,
+                message: '关联成功',
+                data: result
+            });
+        } catch (error) {
+            console.error('关联辩题失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '关联失败',
+                data: null
+            });
+        }
+    },
+
+    // 删除直播流的辩题关联
+    deleteStreamDebateTopic: (req, res) => {
+        try {
+            const result = mockService.debate.removeFromStream(req.params.streamId);
+            res.json({
+                code: 0,
+                message: '删除成功',
+                data: result
+            });
+        } catch (error) {
+            console.error('删除辩题失败:', error);
+            res.status(500).json({
+                code: -1,
+                message: '删除失败',
+                data: null
+            });
+        }
+    },
+
     // 获取用户列表
     getUsers: (req, res) => {
         try {

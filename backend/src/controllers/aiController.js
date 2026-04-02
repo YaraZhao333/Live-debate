@@ -78,8 +78,9 @@ module.exports = {
             const pageSize = parseInt(req.query.pageSize) || 20;
             const startTime = req.query.startTime || null;
             const endTime = req.query.endTime || null;
+            const streamId = req.query.stream_id || req.query.streamId || null;
 
-            const result = aiService.getAIContentList(page, pageSize, startTime, endTime);
+            const result = aiService.getAIContentList(page, pageSize, startTime, endTime, streamId);
 
             res.json({
                 code: 0,
@@ -105,8 +106,9 @@ module.exports = {
             const pageSize = parseInt(req.query.pageSize) || 20;
             const startTime = req.query.startTime || null;
             const endTime = req.query.endTime || null;
+            const streamId = req.query.stream_id || req.query.streamId || null;
 
-            const result = aiService.getFormattedAIContentList(page, pageSize, startTime, endTime);
+            const result = aiService.getFormattedAIContentList(page, pageSize, startTime, endTime, streamId);
 
             res.json({
                 code: 0,

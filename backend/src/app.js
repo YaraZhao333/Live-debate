@@ -108,4 +108,12 @@ app.use('/api/v1', streamDetailRoutes);
 // 辩题路由（前端直接访问，不需要/admin前缀）
 app.use('/api/v1', debateTopicRoutes);
 
+// 静态文件服务 - 提供前端页面
+app.use(express.static(path.join(__dirname, '../../frontend')));
+
+// 处理404 - 重定向到前端入口
+app.use('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/admin/index.html'));
+});
+
 module.exports = { app, server };

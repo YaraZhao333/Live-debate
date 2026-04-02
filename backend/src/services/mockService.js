@@ -23,6 +23,21 @@ const mockData = {
 		}
 	],
 	
+	debates: [
+		{
+			id: 'debate-1',
+			title: "如果有一个能一键消除痛苦的按钮，你会按吗？",
+			description: "这是一个关于痛苦、成长与人性选择的深度辩论",
+			leftPosition: "会按",
+			rightPosition: "不会按",
+			isActive: true,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		}
+	],
+	
+	streamDebates: {},
+	
 	debate: {
 		title: "如果有一个能一键消除痛苦的按钮，你会按吗？",
 		description: "这是一个关于痛苦、成长与人性选择的深度辩论",
@@ -298,6 +313,63 @@ const debate = {
 			updatedAt: new Date().toISOString()
 		};
 		return mockData.debate;
+	},
+	
+	// 创建辩题
+	create: (debateData) => {
+		const newDebate = {
+			id: uuidv4(),
+			...debateData,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		};
+		mockData.debates.push(newDebate);
+		
+		// 如果设置为激活状态，更新全局辩题
+		if (debateData.isActive) {
+			mockData.debate = {
+				title: newDebate.title,
+				description: newDebate.description,
+				leftPosition: newDebate.leftPosition,
+				rightPosition: newDebate.rightPosition,
+				updatedAt: new Date().toISOString()
+			};
+		}
+		
+		return newDebate;
+	},
+	
+	// 获取单个辩题
+	getById: (id) => {
+		return mockData.debates.find(d => d.id === id);
+	},
+	
+	// 关联辩题到直播流
+	associateToStream: (streamId, debateId) => {
+		mockData.streamDebates[streamId] = debateId;
+		return {
+			streamId,
+			debateId,
+			updatedAt: new Date().toISOString()
+		};
+	},
+	
+	// 从直播流中移除辩题关联
+	removeFromStream: (streamId) => {
+		delete mockData.streamDebates[streamId];
+		return {
+			streamId,
+			updatedAt: new Date().toISOString()
+		};
+	},
+	
+	// 获取直播流的辩题
+	getByStreamId: (streamId) => {
+		const debateId = mockData.streamDebates[streamId];
+		if (debateId) {
+			return mockData.debates.find(d => d.id === debateId);
+		}
+		return mockData.debate; // 默认返回全局辩题
 	}
 };
 
