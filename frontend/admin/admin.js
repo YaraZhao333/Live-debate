@@ -7,14 +7,19 @@ const SERVER_CONFIG = {
 	MIDDLEWARE_URL: 'http://192.168.31.249:8081',
 	// 后端服务器地址（真实服务器，直接访问）
 	BACKEND_URL: 'http://192.140.160.119:8000',
+	// 远程网关服务器地址
+	GATEWAY_URL: 'https://live-debate-gateway.onrender.com',
 	// 当前使用的地址（修改这里切换服务器）
 	get BASE_URL() {
-		return 'http://localhost:8081';
+		return 'https://live-debate-gateway.onrender.com';
 	},
 	get WEB_SOCKET_URL() {
-		return 'http://localhost:8081';
+		return 'https://live-debate-gateway.onrender.com';
 	}
 };
+
+// ==================== 直播控制 ====================
+let currentLiveStatus = false;
 
 // 将配置挂载到 window 对象，供其他脚本使用
 window.SERVER_CONFIG = SERVER_CONFIG;
@@ -1026,7 +1031,6 @@ document.getElementById('save-debate-btn')?.addEventListener('click', async () =
 });
 
 // ==================== 直播控制 ====================
-let currentLiveStatus = false;
 
 // 加载当前直播状态
 async function loadLiveStatus() {
