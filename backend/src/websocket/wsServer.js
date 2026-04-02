@@ -56,6 +56,8 @@ function broadcastCurrentState(ws) {
         const debate = mockService.debate.get();
         const votes = getCurrentVotes();
         const voteStats = calculateVotePercentages();
+        const mockLiveStatus = mockService.live.get();
+        const isLive = mockLiveStatus.status === 'online';
 
         ws.send(JSON.stringify({
             type: 'state',
@@ -63,7 +65,7 @@ function broadcastCurrentState(ws) {
                 votes: { ...votes, ...voteStats },
                 debate: debate,
                 dashboard: dashboard,
-                liveStatus: dashboard.isLive
+                liveStatus: isLive
             },
             timestamp: Date.now()
         }));
@@ -126,25 +128,27 @@ function setupWebSocketServer(server) {
         }));
 
         // 发送当前直播状态（关键修复）
-        const liveStatus = getGlobalLiveStatus();
+        const mockLiveStatus = mockService.live.get();
+        const currentStream = mockService.streams.getById(mockLiveStatus.currentStream);
+        const isLive = mockLiveStatus.status === 'online';
         ws.send(JSON.stringify({
             type: 'live-status',
             data: {
-                status: liveStatus.isLive ? 'online' : 'offline',
-                isLive: liveStatus.isLive,
-                streamUrl: liveStatus.streamUrl,
-                streamId: liveStatus.streamId
+                status: mockLiveStatus.status,
+                isLive: isLive,
+                streamUrl: currentStream?.url || null,
+                streamId: mockLiveStatus.currentStream
             },
             timestamp: Date.now()
         }));
 
         // 如果直播已经开始，发送 live-started 事件（关键修复）
-        if (liveStatus.isLive) {
+        if (isLive) {
             ws.send(JSON.stringify({
                 type: 'live-started',
                 data: {
-                    streamId: liveStatus.streamId,
-                    streamUrl: liveStatus.streamUrl,
+                    streamId: mockLiveStatus.currentStream,
+                    streamUrl: currentStream?.url || null,
                     timestamp: Date.now()
                 }
             }));

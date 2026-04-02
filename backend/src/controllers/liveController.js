@@ -25,7 +25,7 @@ module.exports = {
             
             // 如果流没有独立状态且全局状态为 false，检查 mockService.live.status
             if (!isLive && !streamLiveStatus) {
-                isLive = mockService.live.status === 'online';
+                isLive = mockService.live.get().status === 'online';
                 // 如果 mockService.live.status 为 online，使用默认流地址
                 if (isLive && !streamUrl) {
                     streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
@@ -445,7 +445,7 @@ module.exports = {
             
             // 如果流没有独立状态且全局状态为 false，检查 mockService.live.status
             if (!isLive && !streamLiveStatus) {
-                isLive = mockService.live.status === 'online';
+                isLive = mockService.live.get().status === 'online';
                 // 如果 mockService.live.status 为 online，使用默认流地址
                 if (isLive && !streamUrl) {
                     streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';

@@ -217,8 +217,8 @@ const mockData = {
 	},
 
 	live: {
-		status: 'offline',
-		currentStream: null,
+		status: 'online',
+		currentStream: 'mock-stream-1',
 		updatedAt: new Date().toISOString()
 	}
 };
