@@ -1,4 +1,4 @@
-const mockService = require('../services/mockService');
+const voteService = require('../services/voteService');
 const { broadcast } = require('../websocket/wsServer');
 
 // 票数相关控制器
@@ -6,13 +6,16 @@ module.exports = {
     // 获取当前票数
     getVotes: (req, res) => {
         try {
-            const votes = mockService.votes.get();
+            const votes = voteService.getVotes();
             res.json({
                 code: 0,
                 message: 'ok',
                 data: {
                     leftVotes: votes.leftVotes,
                     rightVotes: votes.rightVotes,
+                    totalVotes: votes.totalVotes,
+                    leftPercentage: votes.leftPercentage,
+                    rightPercentage: votes.rightPercentage,
                     timestamp: Date.now()
                 }
             });
@@ -26,16 +29,11 @@ module.exports = {
         }
     },
 
-    // 更新票数
+    // 更新票数（直接设置）
     updateVotes: (req, res) => {
         try {
             const { leftVotes, rightVotes } = req.body;
-            const updatedVotes = mockService.votes.update(leftVotes, rightVotes);
-
-            broadcast('vote-updated', {
-                votes: updatedVotes,
-                updatedBy: 'admin'
-            });
+            const updatedVotes = voteService.setVotes(leftVotes, rightVotes);
 
             res.json({
                 code: 0,
@@ -46,7 +44,28 @@ module.exports = {
             console.error('修改票数失败:', error);
             res.status(400).json({
                 code: -1,
-                message: '修改票数失败',
+                message: '修改票数失败: ' + error.message,
+                data: null
+            });
+        }
+    },
+
+    // 增加票数
+    addVotes: (req, res) => {
+        try {
+            const { leftVotes, rightVotes } = req.body;
+            const updatedVotes = voteService.addVotes(leftVotes, rightVotes);
+
+            res.json({
+                code: 0,
+                message: '增加成功',
+                data: updatedVotes
+            });
+        } catch (error) {
+            console.error('增加票数失败:', error);
+            res.status(400).json({
+                code: -1,
+                message: '增加票数失败: ' + error.message,
                 data: null
             });
         }
@@ -55,24 +74,19 @@ module.exports = {
     // 重置票数
     resetVotes: (req, res) => {
         try {
-            const resetVotes = mockService.votes.reset();
-
-            broadcast('vote-updated', {
-                votes: resetVotes,
-                updatedBy: 'admin',
-                action: 'reset'
-            });
+            const { leftVotes = 0, rightVotes = 0 } = req.body;
+            const resetVotes = voteService.resetVotes(leftVotes, rightVotes);
 
             res.json({
                 code: 0,
                 message: '票数已重置',
-                data: null
+                data: resetVotes
             });
         } catch (error) {
             console.error('重置票数失败:', error);
             res.status(500).json({
                 code: -1,
-                message: '重置票数失败',
+                message: '重置票数失败: ' + error.message,
                 data: null
             });
         }
@@ -82,14 +96,14 @@ module.exports = {
     getVotesStatistics: (req, res) => {
         try {
             const { timeRange } = req.query;
-            const votes = mockService.votes.get();
+            const votes = voteService.getVotes();
 
             res.json({
                 code: 0,
                 message: 'ok',
                 data: {
                     timeRange: timeRange || '24h',
-                    totalVotes: votes.leftVotes + votes.rightVotes + 1800,
+                    totalVotes: votes.totalVotes + 1800,
                     leftVotes: votes.leftVotes + 850,
                     rightVotes: votes.rightVotes + 950,
                     trend: [

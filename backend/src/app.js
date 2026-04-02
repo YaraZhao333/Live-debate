@@ -97,6 +97,9 @@ app.use('/api/v1/admin', streamDetailRoutes);
 // 前端小程序需要的直播状态接口 - 放在最前面，确保/dashboard路由优先匹配
 app.use('/api/v1', liveRoutes);
 
+// 前端小程序需要的票数管理接口
+app.use('/api/v1', voteRoutes);
+
 // 前端小程序需要的AI内容接口 - 已包含在 aiRoutes 中
 
 // AI内容路由（前端直接访问，不需要/admin前缀）

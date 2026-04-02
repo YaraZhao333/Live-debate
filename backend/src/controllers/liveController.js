@@ -269,8 +269,10 @@ module.exports = {
             console.log('✅ 全局直播状态已更新:', updatedStatus);
             
             // 同步更新 mockService.live 状态
-            mockService.live.status = "online";
-            mockService.live.currentStream = finalStreamId;
+            mockService.live.update({
+                status: "online",
+                currentStream: finalStreamId
+            });
             
             // 广播 live-started 事件给所有 WebSocket 客户端
             broadcast('live-started', {
@@ -330,8 +332,10 @@ module.exports = {
             const result = liveService.stopLive(finalStreamId, saveStatistics, notifyUsers);
             
             // 同步更新 mockService.live 状态，保持与 liveState 一致
-            mockService.live.status = "offline";
-            mockService.live.currentStream = null;
+            mockService.live.update({
+                status: "offline",
+                currentStream: null
+            });
             
             return res.json({
                 code: 0,

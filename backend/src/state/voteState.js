@@ -16,8 +16,16 @@ module.exports = {
         }
         return { ...currentVotes };
     },
-    resetVotes: () => {
-        currentVotes = { leftVotes: 0, rightVotes: 0 };
+    addVotes: (leftVotes, rightVotes) => {
+        currentVotes.leftVotes = Math.max(0, currentVotes.leftVotes + leftVotes);
+        currentVotes.rightVotes = Math.max(0, currentVotes.rightVotes + rightVotes);
+        return { ...currentVotes };
+    },
+    resetVotes: (leftVotes = 0, rightVotes = 0) => {
+        currentVotes = { 
+            leftVotes: Math.max(0, leftVotes), 
+            rightVotes: Math.max(0, rightVotes) 
+        };
         return { ...currentVotes };
     },
     calculateVotePercentages: () => {

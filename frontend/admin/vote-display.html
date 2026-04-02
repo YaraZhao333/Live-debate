@@ -1478,9 +1478,10 @@
 			else if (message.type === 'debate-flow-updated') {
 				const flowData = message.data || message;
 				// 检查是否是当前流的更新
-				if (flowData.streamId === currentStreamId && flowData.segments) {
+				if (flowData.streamId === currentStreamId) {
 					console.log('📢 接收到辩论流程更新:', flowData);
-					DEBATE_SEGMENTS = flowData.segments;
+					// 处理后端发送的消息格式，流程数据可能在flow字段中
+					DEBATE_SEGMENTS = flowData.flow || flowData.segments || DEBATE_SEGMENTS;
 					alert('✅ 辩论流程已更新！');
 				}
 			}

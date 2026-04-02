@@ -464,10 +464,18 @@ const votes = {
 		return mockData.votes;
 	},
 	
-	reset: () => {
-		mockData.votes.leftVotes = 50;
-		mockData.votes.rightVotes = 50;
-		mockData.votes.total = 100;
+	add: (leftVotes, rightVotes) => {
+		mockData.votes.leftVotes = (mockData.votes.leftVotes || 0) + leftVotes;
+		mockData.votes.rightVotes = (mockData.votes.rightVotes || 0) + rightVotes;
+		mockData.votes.total = mockData.votes.leftVotes + mockData.votes.rightVotes;
+		mockData.votes.updatedAt = new Date().toISOString();
+		return mockData.votes;
+	},
+	
+	reset: (leftVotes = 50, rightVotes = 50) => {
+		mockData.votes.leftVotes = leftVotes;
+		mockData.votes.rightVotes = rightVotes;
+		mockData.votes.total = leftVotes + rightVotes;
 		mockData.votes.updatedAt = new Date().toISOString();
 		return mockData.votes;
 	}
