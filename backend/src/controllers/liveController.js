@@ -18,16 +18,26 @@ module.exports = {
             const { getStreamLiveStatus } = require('../state/liveState');
             const streamLiveStatus = streamId ? getStreamLiveStatus(streamId) : null;
             
-            // 如果该流有独立状态，使用流的状态；否则使用全局状态
-            const isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
-            const streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
+            // 🔧 关键修复：如果流没有独立状态，检查 mockService.live.status（与后台管理系统保持一致）
+            let isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
+            let streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
             const currentStreamId = streamLiveStatus ? streamId : liveStatus.streamId;
+            
+            // 如果流没有独立状态且全局状态为 false，检查 mockService.live.status
+            if (!isLive && !streamLiveStatus) {
+                isLive = mockService.live.status === 'online';
+                // 如果 mockService.live.status 为 online，使用默认流地址
+                if (isLive && !streamUrl) {
+                    streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+                }
+            }
             
             console.log('📡 getLiveStatus 查询:', { 
                 streamId, 
                 isLive, 
                 streamLiveStatus: streamLiveStatus ? 'found' : 'not found',
-                globalIsLive: liveStatus.isLive 
+                globalIsLive: liveStatus.isLive,
+                mockLiveStatus: mockService.live.status
             });
             
             res.json({
@@ -429,15 +439,25 @@ module.exports = {
             const { getStreamLiveStatus } = require('../state/liveState');
             const streamLiveStatus = streamId ? getStreamLiveStatus(streamId) : null;
             
-            // 如果该流有独立状态，使用流的状态；否则使用全局状态
-            const isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
-            const streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
+            // 🔧 关键修复：如果流没有独立状态，检查 mockService.live.status（与后台管理系统保持一致）
+            let isLive = streamLiveStatus ? streamLiveStatus.isLive : liveStatus.isLive;
+            let streamUrl = streamLiveStatus ? streamLiveStatus.streamUrl : liveStatus.streamUrl;
+            
+            // 如果流没有独立状态且全局状态为 false，检查 mockService.live.status
+            if (!isLive && !streamLiveStatus) {
+                isLive = mockService.live.status === 'online';
+                // 如果 mockService.live.status 为 online，使用默认流地址
+                if (isLive && !streamUrl) {
+                    streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+                }
+            }
             
             console.log('📊 Dashboard 状态计算:', { 
                 streamId, 
                 isLive, 
                 streamLiveStatus: streamLiveStatus ? 'found' : 'not found',
-                globalIsLive: liveStatus.isLive 
+                globalIsLive: liveStatus.isLive,
+                mockLiveStatus: mockService.live.status 
             });
 
             const dashboardData = {
