@@ -249,7 +249,10 @@ module.exports = {
     },
 
     // 获取AI状态
-    getAIStatus: () => {
+    getAIStatus: (streamId = null) => {
+        if (streamId) {
+            return getAIStatusForStream(streamId);
+        }
         return getGlobalAIStatus();
     },
 

@@ -282,16 +282,20 @@ module.exports = {
     // 获取AI状态
     getAIStatus: (req, res) => {
         try {
-            const status = aiService.getAIStatus();
+            const streamId = req.query.stream_id || req.query.streamId;
+            console.log('📡 获取AI状态请求:', { streamId });
+            
+            const status = aiService.getAIStatus(streamId);
             res.json({
                 code: 0,
                 message: 'success',
                 data: status
             });
         } catch (error) {
+            console.error('获取AI状态失败:', error);
             res.status(500).json({
                 code: -1,
-                message: '获取AI内容失败',
+                message: '获取AI状态失败',
                 data: null
             });
         }

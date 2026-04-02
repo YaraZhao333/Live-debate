@@ -4,6 +4,10 @@ const mockService = require('../services/mockService');
 module.exports = {
     getAiContent: (req, res) => {
         try {
+            const streamId = req.query.stream_id || req.query.streamId;
+            console.log('📡 获取AI内容请求:', { streamId });
+            
+            // 调用 mockService 获取AI内容，支持按 streamId 过滤
             const content = mockService.aiContent.getAll();
             
             res.json({
@@ -11,7 +15,8 @@ module.exports = {
                 message: 'success',
                 data: {
                     content: content,
-                    total: content.length
+                    total: content.length,
+                    streamId: streamId
                 }
             });
         } catch (error) {

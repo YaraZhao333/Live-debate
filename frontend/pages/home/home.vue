@@ -1105,11 +1105,11 @@
 						const nowLive = dashboardData.isLive;
 						
 					// 更新流地址（优先使用当前使用的流地址，否则使用启用的流地址）
-					const streamUrl = dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
-					if (streamUrl) {
-						// 使用智能转换方法设置HLS流地址
-						await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
-					}
+				const streamUrl = dashboardData.streamUrl || dashboardData.liveStreamUrl || dashboardData.activeStreamUrl;
+				if (streamUrl) {
+					// 使用智能转换方法设置HLS流地址
+					await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
+				}
 						
 						// ⚠️ 重要：如果服务器显示直播已开始，但客户端状态未同步，强制同步
 						if (nowLive && !wasLive) {
