@@ -108,7 +108,7 @@ const printConfig = () => {
 // ==================== 导出配置 ====================
 
 // === 只改这一行即可一键切换全局API ===
-export const API_BASE_URL = 'http://localhost:8081'; // 本地调试就用本地后端
+// export const API_BASE_URL = 'http://localhost:8081'; // 本地调试就用本地后端
 // export const API_BASE_URL = MIDDLEWARE_SERVER_URL; // 通过中间层服务器 (http://192.168.31.249:8081)
-// export const API_BASE_URL = REAL_SERVER_URL; // 直接连接真实后端服务器 (http://192.140.160.119:8000)
+export const API_BASE_URL = REAL_SERVER_URL; // 直接连接真实后端服务器 (http://192.140.160.119:8000)
 
