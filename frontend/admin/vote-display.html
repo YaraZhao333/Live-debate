@@ -768,7 +768,7 @@
 			</div>
 
 			<!-- 分隔线 -->
-			<div class="header-divider"></div>
+			<!-- <div class="header-divider"></div> -->
 
 			<!-- 反方区域（右侧蓝色） -->
 			<div class="header-right" id="header-right" style="width: 50%;">
@@ -1342,11 +1342,12 @@
 					statusIndicator.classList.remove('live');
 				}
 
-				const leftVotes = data.leftVotes || 0;
-				const rightVotes = data.rightVotes || 0;
-				const totalVotes = data.totalVotes || (leftVotes + rightVotes);
-				const leftPercentage = data.leftPercentage || (totalVotes > 0 ? Math.round((leftVotes / totalVotes) * 100) : 50);
-				const rightPercentage = data.rightPercentage || (totalVotes > 0 ? Math.round((rightVotes / totalVotes) * 100) : 50);
+				const votesData = data.votes || data;
+				const leftVotes = votesData.leftVotes || 0;
+				const rightVotes = votesData.rightVotes || 0;
+				const totalVotes = votesData.totalVotes || (leftVotes + rightVotes);
+				const leftPercentage = votesData.leftPercentage || (totalVotes > 0 ? Math.round((leftVotes / totalVotes) * 100) : 50);
+				const rightPercentage = votesData.rightPercentage || (totalVotes > 0 ? Math.round((rightVotes / totalVotes) * 100) : 50);
 
 				updateVotesDisplay(leftVotes, rightVotes, totalVotes, leftPercentage, rightPercentage);
 				

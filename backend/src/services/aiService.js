@@ -51,7 +51,7 @@ module.exports = {
 
     // 获取格式化的AI内容列表（V1 API）
     getFormattedAIContentList: (page = 1, pageSize = 20, startTime = null, endTime = null, streamId = null) => {
-        const result = this.getAIContentList(page, pageSize, startTime, endTime, streamId);
+        const result = module.exports.getAIContentList(page, pageSize, startTime, endTime, streamId);
 
         // 转换为文档格式
         const items = result.items.map(item => {
@@ -189,7 +189,7 @@ module.exports = {
 
     // 获取格式化的AI内容评论列表（V1 API）
     getFormattedAIContentComments: (contentId, page = 1, pageSize = 20) => {
-        const result = this.getAIContentComments(contentId, page, pageSize);
+        const result = module.exports.getAIContentComments(contentId, page, pageSize);
 
         // 转换为文档格式
         const formattedComments = result.comments.map(comment => {

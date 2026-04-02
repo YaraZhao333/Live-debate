@@ -183,7 +183,11 @@ module.exports = {
                 message: 'success',
                 data: {
                     ...dashboard,
-                    votes: votes,
+                    leftVotes: votes.leftVotes,
+                    rightVotes: votes.rightVotes,
+                    totalVotes: votes.totalVotes,
+                    leftPercentage: votes.leftPercentage,
+                    rightPercentage: votes.rightPercentage,
                     debate: debate,
                     streamId: streamId
                 }

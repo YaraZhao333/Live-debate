@@ -2039,8 +2039,9 @@ loadLiveStatus();
 // ==================== 用户管理 ====================
 async function loadUsers() {
 	try {
-		const data = await fetchUserList(1, 20, {});
-		if (!data || !data.users) {
+		const result = await fetchUserList(1, 20, {});
+		const data = result?.data || result;
+		if (!data) {
 			console.error('获取用户列表失败');
 			return;
 		}
@@ -2048,12 +2049,12 @@ async function loadUsers() {
 		const tbody = document.getElementById('users-table-body');
 		tbody.innerHTML = '';
 		
-		if (data.users.length === 0) {
+		if (data.length === 0) {
 			tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">暂无用户</td></tr>';
 			return;
 		}
 		
-		data.users.forEach(user => {
+		data.forEach(user => {
 			const row = document.createElement('tr');
 			// 获取头像URL，支持多种字段名
 			const avatarUrl = user.avatar || user.avatarUrl || '';
@@ -2073,14 +2074,14 @@ async function loadUsers() {
 			}
 			
 			// 转义userId中的特殊字符，防止XSS和语法错误
-			const safeUserId = (user.userId || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+			const safeUserId = (user.userId || user.id || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 			
 			row.innerHTML = `
-				<td>${user.userId ? user.userId.slice(0, 8) + '...' : 'N/A'}</td>
+				<td>${(user.userId || user.id) ? (user.userId || user.id).slice(0, 8) + '...' : 'N/A'}</td>
 				<td>${(user.nickname || '未设置').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
 				<td><img src="${avatarSrc}" class="avatar-img" onerror="this.src='${placeholderSvg}'; this.onerror=null;"></td>
-				<td>${user.joinTime ? new Date(user.joinTime).toLocaleString() : '-'}</td>
-				<td><span class="badge ${user.status === 'online' ? 'success' : 'secondary'}">${user.status === 'online' ? '在线' : '离线'}</span></td>
+				<td>${user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}</td>
+				<td><span class="badge ${user.status === 'active' ? 'success' : 'secondary'}">${user.status === 'active' ? '活跃' : '非活跃'}</span></td>
 				<td>
 					<button class="btn btn-sm btn-secondary" onclick='viewUser("${safeUserId}")'>查看</button>
 				</td>

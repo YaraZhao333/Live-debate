@@ -525,7 +525,7 @@ async function fetchUserList(page = 1, pageSize = 20, filters = {}) {
 		...filters
 	});
 	
-	return await apiRequest(`/api/v1/admin/miniprogram/users?${queryParams}`, {
+	return await apiRequest(`/api/v1/admin/users?${queryParams}`, {
 		method: 'GET'
 	});
 }
