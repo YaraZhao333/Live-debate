@@ -112,7 +112,27 @@ app.use('/api/v1', streamDetailRoutes);
 app.use('/api/v1', debateTopicRoutes);
 
 // 静态文件服务 - 提供前端页面
-app.use(express.static(path.join(__dirname, '../../frontend')));
+app.use(express.static(path.join(__dirname, '../../frontend'), {
+    setHeaders: (res, path) => {
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        res.set('Access-Control-Allow-Credentials', 'true');
+    }
+}));
+
+// 处理 HLS 流请求，添加 CORS 头
+app.get('/api/v1/admin/live/hls/*', (req, res) => {
+    // 设置 CORS 头
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Range');
+    res.set('Access-Control-Expose-Headers', 'Content-Length, Content-Range');
+    
+    // 重定向到测试 HLS 流地址
+    const testHlsUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+    res.redirect(testHlsUrl);
+});
 
 // 处理404 - 重定向到前端入口
 app.use('*', (req, res) => {

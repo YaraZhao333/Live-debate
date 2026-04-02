@@ -130,8 +130,8 @@ function initVotesEvents() {
 			if (result) {
 				// 更新显示
 				updateVotesDisplay({
-					leftVotes: result.currentVotes.leftVotes,
-					rightVotes: result.currentVotes.rightVotes
+					leftVotes: result.leftVotes || 0,
+					rightVotes: result.rightVotes || 0
 				});
 			}
 		});
@@ -255,6 +255,12 @@ function clearVotesDisplay() {
 
 // 更新票数显示
 function updateVotesDisplay(data) {
+	// 确保 data 是一个对象
+	if (!data || typeof data !== 'object') {
+		console.warn('⚠️ updateVotesDisplay 接收到无效数据:', data);
+		return;
+	}
+	
 	const leftVotesEl = document.getElementById('admin-left-votes');
 	const rightVotesEl = document.getElementById('admin-right-votes');
 	const totalVotesEl = document.getElementById('admin-total-votes');

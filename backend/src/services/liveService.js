@@ -217,7 +217,7 @@ module.exports = {
 
     // 重置投票
     resetVotes: (leftVotes = 0, rightVotes = 0, saveBackup = true, notifyUsers = true, streamId = null) => {
-        const votes = voteService.setVotes(leftVotes, rightVotes);
+        const votes = voteService.resetVotes(leftVotes, rightVotes);
 
         if (notifyUsers) {
             broadcast('votes-updated', {
