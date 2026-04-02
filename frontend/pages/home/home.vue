@@ -1154,18 +1154,31 @@
 										this.startAIContentAfterLiveStart();
 									}, 1000);
 								} else {
-									// 即使没有流地址，如果服务器明确说直播已开始，也更新状态
-									this.isLiveStarted = true;
+									// 没有流地址，不设置直播开始状态
+									console.warn('⚠️ 服务器说直播已开始，但没有提供流地址');
+									uni.showToast({
+										title: '直播已开始，但未获取到流地址',
+										icon: 'none',
+										duration: 3000
+									});
 								}
 							});
 						} else if (nowLive && wasLive) {
 						// 直播已经在进行中，确保状态同步
-						if (!this.isLiveStarted) {
-							this.isLiveStarted = true;
-						}
-						// 确保流地址存在
+						// 确保流地址存在才设置直播开始状态
 						if (!this.liveStreamUrl && streamUrl) {
 							await this.setLiveStreamUrlWithHls(streamUrl, dashboardData.activeStreamName);
+							// 只有在设置了流地址后才设置直播开始状态
+							if (!this.isLiveStarted) {
+								this.isLiveStarted = true;
+							}
+						} else if (this.liveStreamUrl && !this.isLiveStarted) {
+							// 如果已经有流地址，直接设置直播开始状态
+							this.isLiveStarted = true;
+						}
+						// 如果没有流地址，不设置直播开始状态
+						if (!this.liveStreamUrl) {
+							console.warn('⚠️ 直播已开始，但没有流地址，无法播放');
 						}
 					} else if (!nowLive && wasLive) {
 						// 🔧 直播从开始变为停止 - 强制退出并返回直播选择页面

@@ -91,11 +91,6 @@
 			
 			// 显示 Loading 动画
 			this.isLoading = true
-			
-			// 初始化 Loading 动画
-			this.$nextTick(() => {
-				this.initLoadingLottie()
-			})
 
 			// ⚡ 临时方案：跳过微信登录，直接进入小程序
 			await this.bypassWechatLogin()
